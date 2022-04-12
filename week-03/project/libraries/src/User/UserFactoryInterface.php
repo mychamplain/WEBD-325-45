@@ -6,14 +6,12 @@
  * @license    GNU General Public License version 2 or later; see LICENSE.txt
  */
 
-namespace Joomla\CMS\User;
-
-\defined('_JEXEC') or die;
+namespace Octoleo\CMS\User;
 
 /**
  * Interface defining a factory which can create User objects
  *
- * @since  4.0.0
+ * @since  1.0.0
  */
 interface UserFactoryInterface
 {
@@ -24,7 +22,7 @@ interface UserFactoryInterface
 	 *
 	 * @return  User
 	 *
-	 * @since   4.0.0
+	 * @since   1.0.0
 	 */
 	public function loadUserById(int $id): User;
 
@@ -35,7 +33,16 @@ interface UserFactoryInterface
 	 *
 	 * @return  User
 	 *
-	 * @since   4.0.0
+	 * @since   1.0.0
 	 */
 	public function loadUserByUsername(string $username): User;
+
+	/**
+	 * Attempt to authenticate the username and password pair.
+	 *
+	 * @return  string|boolean  A string containing a username if authentication is successful, false otherwise.
+	 *
+	 * @since   1.1.0
+	 */
+	public function authenticate();
 }

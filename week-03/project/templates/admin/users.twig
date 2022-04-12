@@ -1,0 +1,32 @@
+{% extends "index.twig" %}
+
+{% block title %}Users{% endblock %}
+
+{% block content %}
+<div class="uk-container uk-margin">
+    <h1 class="uk-article-title">Users</h1>
+    <a class="uk-button uk-button-default" href="{{ url() }}index.php?dashboard=user">Create</a>
+    <table class="uk-table uk-table-justify uk-table-divider">
+        <thead>
+        <tr>
+            <th class="uk-width-small">Table Heading</th>
+            <th>Table Heading</th>
+            <th>Table Heading</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td>Table Data</td>
+            <td>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</td>
+            <td><a class="uk-button uk-button-default" href="{{ url() }}index.php?dashboard=user&id=1">Edit</a></td>
+        </tr>
+        <tr>
+            <td>Table Data</td>
+            <td>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</td>
+            <td><a class="uk-button uk-button-default" href="{{ url() }}index.php?dashboard=user&id=2">Edit</a></td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+<!-- Source: https://getuikit.com/docs/table -->
+{% endblock %}

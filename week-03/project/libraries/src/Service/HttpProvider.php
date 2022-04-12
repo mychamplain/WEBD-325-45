@@ -1,12 +1,12 @@
 <?php
 /**
- * Joomla! Framework Website
- *
- * @copyright  Copyright (C) 2014 - 2017 Open Source Matters, Inc. All rights reserved.
- * @license    http://www.gnu.org/licenses/gpl-2.0.txt GNU General Public License Version 2 or Later
- */
+* Joomla! Framework Website
+*
+* @copyright  Copyright (C) 2014 - 2017 Open Source Matters, Inc. All rights reserved.
+* @license    http://www.gnu.org/licenses/gpl-2.0.txt GNU General Public License Version 2 or Later
+*/
 
-namespace Joomla\FrameworkWebsite\Service;
+namespace Octoleo\CMS\Service;
 
 use Joomla\DI\Container;
 use Joomla\DI\ServiceProviderInterface;
@@ -15,6 +15,7 @@ use Joomla\Http\HttpFactory;
 
 /**
  * HTTP service provider
+ * source: https://github.com/joomla/framework.joomla.org/blob/master/src/Service/HttpProvider.php
  */
 class HttpProvider implements ServiceProviderInterface
 {

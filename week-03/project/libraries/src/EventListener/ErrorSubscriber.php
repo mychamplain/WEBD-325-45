@@ -1,19 +1,19 @@
 <?php
 /**
- * Joomla! Framework Website
- *
- * @copyright  Copyright (C) 2014 - 2017 Open Source Matters, Inc. All rights reserved.
- * @license    http://www.gnu.org/licenses/gpl-2.0.txt GNU General Public License Version 2 or Later
- */
+* Joomla! Framework Website
+*
+* @copyright  Copyright (C) 2014 - 2017 Open Source Matters, Inc. All rights reserved.
+* @license    http://www.gnu.org/licenses/gpl-2.0.txt GNU General Public License Version 2 or Later
+*/
 
-namespace Joomla\FrameworkWebsite\EventListener;
+namespace Octoleo\CMS\EventListener;
 
 use Joomla\Application\ApplicationEvents;
 use Joomla\Application\Event\ApplicationErrorEvent;
 use Joomla\Console\ConsoleEvents;
 use Joomla\Console\Event\ApplicationErrorEvent as ConsoleApplicationErrorEvent;
 use Joomla\Event\SubscriberInterface;
-use Joomla\FrameworkWebsite\WebApplication;
+use Octoleo\CMS\Application\SiteApplication;
 use Joomla\Renderer\RendererInterface;
 use Joomla\Router\Exception\MethodNotAllowedException;
 use Joomla\Router\Exception\RouteNotFoundException;
@@ -24,6 +24,7 @@ use Psr\Log\LoggerAwareTrait;
 
 /**
  * Error handling event subscriber
+ * source: https://github.com/joomla/framework.joomla.org/blob/master/src/EventListener/ErrorSubscriber.php
  */
 class ErrorSubscriber implements SubscriberInterface, LoggerAwareInterface
 {
@@ -80,7 +81,7 @@ class ErrorSubscriber implements SubscriberInterface, LoggerAwareInterface
 	 */
 	public function handleWebError(ApplicationErrorEvent $event): void
 	{
-		/** @var WebApplication $app */
+		/** @var SiteApplication $app */
 		$app = $event->getApplication();
 
 		switch (true)
@@ -142,7 +143,7 @@ class ErrorSubscriber implements SubscriberInterface, LoggerAwareInterface
 	 */
 	private function prepareResponse(ApplicationErrorEvent $event): void
 	{
-		/** @var WebApplication $app */
+		/** @var SiteApplication $app */
 		$app = $event->getApplication();
 
 		$app->allowCache(false);

@@ -1,67 +1,56 @@
 <?php
 /**
- * Joomla! Framework Website
+ * @package    Octoleo CMS
  *
- * @copyright  Copyright (C) 2014 - 2017 Open Source Matters, Inc. All rights reserved.
- * @license    http://www.gnu.org/licenses/gpl-2.0.txt GNU General Public License Version 2 or Later
+ * @created    9th April 2022
+ * @author     Llewellyn van der Merwe <https://git.vdm.dev/Llewellyn>
+ * @git        WEBD-325-45 <https://git.vdm.dev/Llewellyn/WEBD-325-45>
+ * @license    GNU General Public License version 2 or later; see LICENSE.txt
  */
 
-namespace Joomla\FrameworkWebsite\View\Package;
+namespace Octoleo\CMS\View\Page;
 
-use Joomla\FrameworkWebsite\Helper;
-use Joomla\FrameworkWebsite\Model\PackageModel;
-use Joomla\FrameworkWebsite\Model\ReleaseModel;
+use Octoleo\CMS\Model\PageModel;
 use Joomla\Renderer\RendererInterface;
 use Joomla\View\HtmlView;
 
 /**
- * Package HTML view class for the application
+ * Page HTML view class for the application
  */
-class PackageHtmlView extends HtmlView
+class PageHtmlView extends HtmlView
 {
 	/**
-	 * Helper object
-	 *
-	 * @var  Helper
-	 */
-	private $helper;
-
-	/**
-	 * The active package
+	 * The active page
 	 *
 	 * @var  string
 	 */
-	private $package = '';
+	private $page = '';
 
 	/**
-	 * The package model object.
+	 * The active page details
 	 *
-	 * @var  PackageModel
+	 * @var string
 	 */
-	private $packageModel;
+	private $details;
 
 	/**
-	 * The release model object.
+	 * The page model object.
 	 *
-	 * @var  ReleaseModel
+	 * @var  PageModel
 	 */
-	private $releaseModel;
+	private $pageModel;
 
 	/**
 	 * Instantiate the view.
 	 *
-	 * @param   PackageModel       $packageModel     The package model object.
-	 * @param   ReleaseModel       $releaseModel     The release model object.
-	 * @param   Helper             $helper           Helper object.
+	 * @param   PageModel          $pageModel     The page model object.
 	 * @param   RendererInterface  $renderer         The renderer object.
 	 */
-	public function __construct(PackageModel $packageModel, ReleaseModel $releaseModel, Helper $helper, RendererInterface $renderer)
+	public function __construct(PageModel $pageModel, RendererInterface $renderer)
 	{
 		parent::__construct($renderer);
 
-		$this->helper       = $helper;
-		$this->packageModel = $packageModel;
-		$this->releaseModel = $releaseModel;
+		$this->pageModel = $pageModel;
 	}
 
 	/**
@@ -71,12 +60,10 @@ class PackageHtmlView extends HtmlView
 	 */
 	public function render()
 	{
-		$package = $this->packageModel->getPackage($this->package);
-
 		$this->setData(
 			[
-				'releases' => $this->releaseModel->getPackageHistory($package),
-				'package'  => $package,
+				'page' => $this->pageModel->getPage($this->page),
+				'details' => $this->pageModel->getDetails($this->details)
 			]
 		);
 
@@ -84,14 +71,26 @@ class PackageHtmlView extends HtmlView
 	}
 
 	/**
-	 * Set the active package
+	 * Set the active page
 	 *
-	 * @param   string  $package  The active package name
+	 * @param   string  $page  The active page name
 	 *
 	 * @return  void
 	 */
-	public function setPackage(string $package): void
+	public function setPage(string $page): void
 	{
-		$this->package = $package;
+		$this->page = $page;
+	}
+
+	/**
+	 * Set the active page details
+	 *
+	 * @param   string  $page  The active page name
+	 *
+	 * @return  void
+	 */
+	public function setDetails(string $details): void
+	{
+		$this->details = $details;
 	}
 }

@@ -1,46 +1,48 @@
 <?php
 /**
- * Joomla! Framework Website
+ * @package    Octoleo CMS
  *
- * @copyright  Copyright (C) 2014 - 2017 Open Source Matters, Inc. All rights reserved.
- * @license    http://www.gnu.org/licenses/gpl-2.0.txt GNU General Public License Version 2 or Later
+ * @created    9th April 2022
+ * @author     Llewellyn van der Merwe <https://git.vdm.dev/Llewellyn>
+ * @git        WEBD-325-45 <https://git.vdm.dev/Llewellyn/WEBD-325-45>
+ * @license    GNU General Public License version 2 or later; see LICENSE.txt
  */
 
-namespace Joomla\FrameworkWebsite\Controller;
+namespace Octoleo\CMS\Controller;
 
 use Joomla\Application\AbstractApplication;
 use Joomla\Controller\AbstractController;
-use Joomla\FrameworkWebsite\View\Package\PackageHtmlView;
 use Joomla\Input\Input;
+use Joomla\Renderer\RendererInterface;
 use Laminas\Diactoros\Response\HtmlResponse;
 
 /**
- * Controller handling a package's status data listing
+ * Controller handling the site's homepage
  *
- * @method         \Joomla\FrameworkWebsite\WebApplication  getApplication()  Get the application object.
- * @property-read  \Joomla\FrameworkWebsite\WebApplication  $app              Application object
+ * @method         \Octoleo\CMS\Application\SiteApplication  getApplication()  Get the application object.
+ * @property-read  \Octoleo\CMS\Application\SiteApplication  $app              Application object
  */
-class PackageController extends AbstractController
+class HomepageController extends AbstractController
 {
 	/**
-	 * The view object.
+	 * The template renderer.
 	 *
-	 * @var  PackageHtmlView
+	 * @var  RendererInterface
 	 */
-	private $view;
+	private $renderer;
 
 	/**
 	 * Constructor.
 	 *
-	 * @param   PackageHtmlView      $view   The view object.
-	 * @param   Input                $input  The input object.
-	 * @param   AbstractApplication  $app    The application object.
+	 * @param   RendererInterface    $renderer  The template renderer.
+	 * @param   Input                $input     The input object.
+	 * @param   AbstractApplication  $app       The application object.
 	 */
-	public function __construct(PackageHtmlView $view, Input $input = null, AbstractApplication $app = null)
+	public function __construct(RendererInterface $renderer, Input $input = null, AbstractApplication $app = null)
 	{
 		parent::__construct($input, $app);
 
-		$this->view = $view;
+		$this->renderer = $renderer;
 	}
 
 	/**
@@ -53,9 +55,7 @@ class PackageController extends AbstractController
 		// Enable browser caching
 		$this->getApplication()->allowCache(true);
 
-		$this->view->setPackage($this->getInput()->getString('package'));
-
-		$this->getApplication()->setResponse(new HtmlResponse($this->view->render()));
+		$this->getApplication()->setResponse(new HtmlResponse($this->renderer->render('homepage.twig')));
 
 		return true;
 	}

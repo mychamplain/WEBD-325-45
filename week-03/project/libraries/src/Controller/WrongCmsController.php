@@ -1,12 +1,14 @@
 <?php
 /**
- * Joomla! Framework Website
+ * @package    Octoleo CMS
  *
- * @copyright  Copyright (C) 2014 - 2017 Open Source Matters, Inc. All rights reserved.
- * @license    http://www.gnu.org/licenses/gpl-2.0.txt GNU General Public License Version 2 or Later
+ * @created    9th April 2022
+ * @author     Llewellyn van der Merwe <https://git.vdm.dev/Llewellyn>
+ * @git        WEBD-325-45 <https://git.vdm.dev/Llewellyn/WEBD-325-45>
+ * @license    GNU General Public License version 2 or later; see LICENSE.txt
  */
 
-namespace Joomla\FrameworkWebsite\Controller;
+namespace Octoleo\CMS\Controller;
 
 use Joomla\Controller\AbstractController;
 use Laminas\Diactoros\Response\TextResponse;
@@ -14,8 +16,8 @@ use Laminas\Diactoros\Response\TextResponse;
 /**
  * Controller class to display a message to individuals looking for the wrong CMS
  *
- * @method         \Joomla\FrameworkWebsite\WebApplication  getApplication()  Get the application object.
- * @property-read  \Joomla\FrameworkWebsite\WebApplication  $app              Application object
+ * @method         \Octoleo\CMS\Application\SiteApplication  getApplication()  Get the application object.
+ * @property-read  \Octoleo\CMS\Application\SiteApplication  $app              Application object
  */
 class WrongCmsController extends AbstractController
 {

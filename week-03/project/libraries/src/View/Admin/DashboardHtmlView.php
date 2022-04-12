@@ -1,67 +1,49 @@
 <?php
 /**
- * Joomla! Framework Website
+ * @package    Octoleo CMS
  *
- * @copyright  Copyright (C) 2014 - 2017 Open Source Matters, Inc. All rights reserved.
- * @license    http://www.gnu.org/licenses/gpl-2.0.txt GNU General Public License Version 2 or Later
+ * @created    9th April 2022
+ * @author     Llewellyn van der Merwe <https://git.vdm.dev/Llewellyn>
+ * @git        WEBD-325-45 <https://git.vdm.dev/Llewellyn/WEBD-325-45>
+ * @license    GNU General Public License version 2 or later; see LICENSE.txt
  */
 
-namespace Joomla\FrameworkWebsite\View\Package;
+namespace Octoleo\CMS\View\Admin;
 
-use Joomla\FrameworkWebsite\Helper;
-use Joomla\FrameworkWebsite\Model\PackageModel;
-use Joomla\FrameworkWebsite\Model\ReleaseModel;
+use Octoleo\CMS\Model\DashboardModel;
 use Joomla\Renderer\RendererInterface;
 use Joomla\View\HtmlView;
 
 /**
- * Package HTML view class for the application
+ * Dashboard HTML view class for the application
  */
-class PackageHtmlView extends HtmlView
+class DashboardHtmlView extends HtmlView
 {
 	/**
-	 * Helper object
+	 * The id of item/user/menu
 	 *
-	 * @var  Helper
+	 * @var int
 	 */
-	private $helper;
+	private $id;
 
 	/**
-	 * The active package
+	 * The page model object.
 	 *
-	 * @var  string
+	 * @var  DashboardModel
 	 */
-	private $package = '';
-
-	/**
-	 * The package model object.
-	 *
-	 * @var  PackageModel
-	 */
-	private $packageModel;
-
-	/**
-	 * The release model object.
-	 *
-	 * @var  ReleaseModel
-	 */
-	private $releaseModel;
+	private $dashboardModel;
 
 	/**
 	 * Instantiate the view.
 	 *
-	 * @param   PackageModel       $packageModel     The package model object.
-	 * @param   ReleaseModel       $releaseModel     The release model object.
-	 * @param   Helper             $helper           Helper object.
+	 * @param   DashboardModel     $dashboardModel   The page model object.
 	 * @param   RendererInterface  $renderer         The renderer object.
 	 */
-	public function __construct(PackageModel $packageModel, ReleaseModel $releaseModel, Helper $helper, RendererInterface $renderer)
+	public function __construct(DashboardModel $dashboardModel, RendererInterface $renderer)
 	{
 		parent::__construct($renderer);
 
-		$this->helper       = $helper;
-		$this->packageModel = $packageModel;
-		$this->releaseModel = $releaseModel;
+		$this->dashboardModel = $dashboardModel;
 	}
 
 	/**
@@ -71,27 +53,31 @@ class PackageHtmlView extends HtmlView
 	 */
 	public function render()
 	{
-		$package = $this->packageModel->getPackage($this->package);
-
-		$this->setData(
-			[
-				'releases' => $this->releaseModel->getPackageHistory($package),
-				'package'  => $package,
-			]
-		);
-
+		$this->setData(['page' => $this->id]);
 		return parent::render();
 	}
 
 	/**
-	 * Set the active package
+	 * Set the active dashboard
 	 *
-	 * @param   string  $package  The active package name
+	 * @param   string  $name  The active page name
 	 *
 	 * @return  void
 	 */
-	public function setPackage(string $package): void
+	public function setActiveDashboard(string $name): void
 	{
-		$this->package = $package;
+		$this->setLayout($this->dashboardModel->getDashboard($name));
+	}
+
+	/**
+	 * Set the active page details
+	 *
+	 * @param   int  $id  The selected item/user/menu
+	 *
+	 * @return  void
+	 */
+	public function setActiveId(int $id): void
+	{
+		$this->id = $id;
 	}
 }

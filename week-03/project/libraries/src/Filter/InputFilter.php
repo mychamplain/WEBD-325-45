@@ -6,11 +6,9 @@
  * @license    GNU General Public License version 2 or later; see LICENSE.txt
  */
 
-namespace Joomla\CMS\Filter;
+namespace Octoleo\CMS\Filter;
 
-\defined('JPATH_PLATFORM') or die;
-
-use Joomla\CMS\String\PunycodeHelper;
+use Octoleo\CMS\String\PunycodeHelper;
 use Joomla\Filter\InputFilter as BaseInputFilter;
 
 /**

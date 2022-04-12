@@ -6,9 +6,7 @@
  * @license    GNU General Public License version 2 or later; see LICENSE.txt
  */
 
-namespace Joomla\CMS\String;
-
-\defined('JPATH_PLATFORM') or die;
+namespace Octoleo\CMS\String;
 
 use Algo26\IdnaConvert\ToIdn;
 use Algo26\IdnaConvert\ToUnicode;

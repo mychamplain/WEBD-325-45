@@ -6,17 +6,17 @@
  * @license    GNU General Public License version 2 or later; see LICENSE.txt
  */
 
-namespace Joomla\CMS\Autoload;
+namespace Octoleo\CMS\Autoload;
 
-\defined('_JEXEC') or die;
+\defined('_LEXEC') or die;
 
 use Composer\Autoload\ClassLoader as ComposerClassLoader;
 
 /**
- * Decorate Composer ClassLoader for Joomla!
+ * Decorate Composer ClassLoader for Octoleo!
  *
  * For backward compatibility due to class aliasing in the CMS, the loadClass() method was modified to call
- * the JLoader::applyAliasFor() method.
+ * the LLoader::applyAliasFor() method.
  *
  * @since  3.4
  */
@@ -55,7 +55,7 @@ class ClassLoader
 	{
 		if ($result = $this->loader->loadClass($class))
 		{
-			\JLoader::applyAliasFor($class);
+			\LLoader::applyAliasFor($class);
 		}
 
 		return $result;

@@ -6,7 +6,7 @@
  * @license    http://www.gnu.org/licenses/gpl-2.0.txt GNU General Public License Version 2 or Later
  */
 
-namespace Joomla\FrameworkWebsite\Asset;
+namespace Octoleo\CMS\Asset;
 
 use Symfony\Component\Asset\Context\ContextInterface;
 use Symfony\Component\Asset\Package;
@@ -15,6 +15,7 @@ use Symfony\Component\Asset\VersionStrategy\VersionStrategyInterface;
 
 /**
  * Extended path package for resolving assets from a Laravel Mix manifest
+ * source: https://github.com/joomla/framework.joomla.org/blob/master/src/Asset/MixPathPackage.php
  */
 class MixPathPackage extends PathPackage
 {

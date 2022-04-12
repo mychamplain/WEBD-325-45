@@ -1,20 +1,19 @@
 <?php
 /**
- * Joomla! Framework Website
+ * @package    Octoleo CMS
  *
- * @copyright  Copyright (C) 2014 - 2017 Open Source Matters, Inc. All rights reserved.
- * @license    http://www.gnu.org/licenses/gpl-2.0.txt GNU General Public License Version 2 or Later
+ * @created    9th April 2022
+ * @author     Llewellyn van der Merwe <https://git.vdm.dev/Llewellyn>
+ * @git        WEBD-325-45 <https://git.vdm.dev/Llewellyn/WEBD-325-45>
+ * @license    GNU General Public License version 2 or later; see LICENSE.txt
  */
 
-namespace Joomla\FrameworkWebsite\Service;
+namespace Octoleo\CMS\Service;
 
 use Joomla\DI\Container;
 use Joomla\DI\ServiceProviderInterface;
 use Joomla\Registry\Registry;
 
-/**
- * Configuration service provider
- */
 class ConfigurationProvider implements ServiceProviderInterface
 {
 	/**
@@ -39,10 +38,21 @@ class ConfigurationProvider implements ServiceProviderInterface
 			throw new \RuntimeException('Configuration file does not exist or is unreadable.');
 		}
 
-		$this->config = (new Registry)->loadFile($file);
+		// load the class
+		include_once $file;
+		$this->config = new Registry(new \LConfig());
 
-		// Hardcode database driver option
-		$this->config->set('database.driver', 'mysql');
+		// Set database values based on config values
+		$this->config->loadObject( (object) ['database' => [
+			'driver' => 'mysql',
+			'host' => $this->config->get('host'),
+			'port' => $this->config->get('port', ''),
+			'user' => $this->config->get('user'),
+			'password' => $this->config->get('password'),
+			'database' => $this->config->get('db'),
+			'prefix' => $this->config->get('dbprefix')
+			]
+		]);
 	}
 
 	/**

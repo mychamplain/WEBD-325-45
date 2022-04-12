@@ -6,13 +6,9 @@
  * @license    GNU General Public License version 2 or later; see LICENSE.txt
  */
 
-namespace Joomla\CMS\Session;
+namespace Octoleo\CMS\Session;
 
-\defined('JPATH_PLATFORM') or die;
-
-use Joomla\Application\AbstractApplication;
-use Joomla\CMS\Application\CMSApplication;
-use Joomla\CMS\User\User;
+use Octoleo\CMS\User\User;
 use Joomla\Database\DatabaseInterface;
 use Joomla\Database\Exception\ExecutionFailureException;
 use Joomla\Database\ParameterType;
@@ -54,14 +50,6 @@ final class MetadataManager
 	private static $sessionRecordUnknown = -1;
 
 	/**
-	 * Application object.
-	 *
-	 * @var    AbstractApplication
-	 * @since  3.8.6
-	 */
-	private $app;
-
-	/**
 	 * Database driver.
 	 *
 	 * @var    DatabaseInterface
@@ -72,14 +60,12 @@ final class MetadataManager
 	/**
 	 * MetadataManager constructor.
 	 *
-	 * @param   AbstractApplication  $app  Application object.
 	 * @param   DatabaseInterface    $db   Database driver.
 	 *
 	 * @since   3.8.6
 	 */
-	public function __construct(AbstractApplication $app, DatabaseInterface $db)
+	public function __construct(DatabaseInterface $db)
 	{
-		$this->app = $app;
 		$this->db  = $db;
 	}
 
@@ -167,6 +153,29 @@ final class MetadataManager
 	}
 
 	/**
+	 * Get session record exists
+	 *
+	 * @param   string  $sessionId  The session ID to check
+	 *
+	 * @return mixed  on success value for record presence
+	 *
+	 * @since   1.0.0
+	 */
+	public function getSessionRecord(string $sessionId)
+	{
+		$query = $this->db->getQuery(true)
+			->select('*')
+			->from($this->db->quoteName('#__session'))
+			->where($this->db->quoteName('session_id') . ' = :session_id')
+			->bind(':session_id', $sessionId)
+			->setLimit(1);
+
+		$this->db->setQuery($query);
+
+		return $this->db->loadObject();
+	}
+
+	/**
 	 * Check if the session record exists
 	 *
 	 * @param   string  $sessionId  The session ID to check
@@ -238,25 +247,15 @@ final class MetadataManager
 
 		// Bind query values
 		$sessionId   = $session->getId();
-		$userIsGuest = $user->guest;
-		$userId      = $user->id;
-		$username    = $user->username === null ? '' : $user->username;
+		$userIsGuest = $user->get('guest', 0);
+		$userId      = $user->get('id', 0);
+		$username    = $user->get('username', '');
 
 		$query->bind(':session_id', $sessionId)
 			->bind(':guest', $userIsGuest, ParameterType::INTEGER)
 			->bind(':time', $time)
 			->bind(':user_id', $userId, ParameterType::INTEGER)
 			->bind(':username', $username);
-
-		if ($this->app instanceof CMSApplication && !$this->app->get('shared_session', false))
-		{
-			$clientId = $this->app->getClientId();
-
-			$columns[] = $this->db->quoteName('client_id');
-			$values[] = ':client_id';
-
-			$query->bind(':client_id', $clientId, ParameterType::INTEGER);
-		}
 
 		$query->insert($this->db->quoteName('#__session'))
 			->columns($columns)
@@ -299,24 +298,15 @@ final class MetadataManager
 
 		// Bind query values
 		$sessionId   = $session->getId();
-		$userIsGuest = $user->guest;
-		$userId      = $user->id;
-		$username    = $user->username === null ? '' : $user->username;
+		$userIsGuest = $user->get('guest', 0);
+		$userId      = $user->get('id', 0);
+		$username    = $user->get('username', '');
 
 		$query->bind(':session_id', $sessionId)
 			->bind(':guest', $userIsGuest, ParameterType::INTEGER)
 			->bind(':time', $time)
 			->bind(':user_id', $userId, ParameterType::INTEGER)
 			->bind(':username', $username);
-
-		if ($this->app instanceof CMSApplication && !$this->app->get('shared_session', false))
-		{
-			$clientId = $this->app->getClientId();
-
-			$setValues[] = $this->db->quoteName('client_id') . ' = :client_id';
-
-			$query->bind(':client_id', $clientId, ParameterType::INTEGER);
-		}
 
 		$query->update($this->db->quoteName('#__session'))
 			->set($setValues)

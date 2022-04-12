@@ -6,7 +6,7 @@
  * @license    http://www.gnu.org/licenses/gpl-2.0.txt GNU General Public License Version 2 or Later
  */
 
-namespace Joomla\FrameworkWebsite\Service;
+namespace Octoleo\CMS\Service;
 
 use Joomla\DI\Container;
 use Joomla\DI\ServiceProviderInterface;
@@ -17,6 +17,7 @@ use Monolog\Processor\WebProcessor;
 
 /**
  * Logging service provider
+ * source: https://github.com/joomla/framework.joomla.org/blob/master/src/Service/LoggingProvider.php
  */
 class LoggingProvider implements ServiceProviderInterface
 {
@@ -61,7 +62,7 @@ class LoggingProvider implements ServiceProviderInterface
 
 		$level = strtoupper($config->get('log.application', $config->get('log.level', 'error')));
 
-		return new StreamHandler(JPATH_ROOT . '/logs/framework.log', \constant('\\Monolog\\Logger::' . $level));
+		return new StreamHandler(LPATH_ROOT . '/logs/framework.log', \constant('\\Monolog\\Logger::' . $level));
 	}
 
 	/**

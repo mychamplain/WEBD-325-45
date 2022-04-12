@@ -1,63 +1,95 @@
 <?php
 /**
- * @package    Joomla.Site
+ * @package    Octoleo CMS
  *
- * @copyright  (C) 2017 Open Source Matters, Inc. <https://www.joomla.org>
+ * @created    9th April 2022
+ * @author     Llewellyn van der Merwe <https://git.vdm.dev/Llewellyn>
+ * @git        WEBD-325-45 <https://git.vdm.dev/Llewellyn/WEBD-325-45>
  * @license    GNU General Public License version 2 or later; see LICENSE.txt
  */
 
-defined('_JEXEC') or die;
+defined('_LEXEC') or die;
 
-// Saves the start time and memory usage.
-$startTime = microtime(1);
-$startMem  = memory_get_usage();
-
+// Option to override defines from root folder
+// source: https://github.com/joomla/joomla-cms/blob/4.1-dev/includes/app.php#L15
 if (file_exists(dirname(__DIR__) . '/defines.php'))
 {
 	include_once dirname(__DIR__) . '/defines.php';
 }
 
-if (!defined('_JDEFINES'))
+// Load the default defines
+// source: https://github.com/joomla/joomla-cms/blob/4.1-dev/includes/app.php#L20
+if (!defined('_LDEFINES'))
 {
-	define('JPATH_BASE', dirname(__DIR__));
-	require_once JPATH_BASE . '/includes/defines.php';
+	define('LPATH_BASE', dirname(__DIR__));
+	require_once LPATH_BASE . '/includes/defines.php';
 }
 
 // Check for presence of vendor dependencies not included in the git repository
-if (!file_exists(JPATH_LIBRARIES . '/vendor/autoload.php') || !is_dir(JPATH_ROOT . '/media/vendor'))
+// source: https://github.com/joomla/joomla-cms/blob/4.1-dev/includes/app.php#L26
+if (!file_exists(LPATH_LIBRARIES . '/vendor/autoload.php'))
 {
-	echo file_get_contents(JPATH_ROOT . '/templates/system/build_incomplete.html');
+	echo file_get_contents(LPATH_ROOT . '/templates/system/build_incomplete.html');
 
 	exit;
 }
 
-require_once JPATH_BASE . '/includes/framework.php';
+// Load configuration (or install)
+// source: https://github.com/joomla/joomla-cms/blob/4.1-dev/includes/app.php#L34
+require_once LPATH_BASE . '/includes/framework.php';
 
-// Set profiler start time and memory usage and mark afterLoad in the profiler.
-JDEBUG && \Joomla\CMS\Profiler\Profiler::getInstance('Application')->setStart($startTime, $startMem)->mark('afterLoad');
+// Wrap in a try/catch so we can display an error if need be
+try
+{
+	$container = (new Joomla\DI\Container)
+		->registerServiceProvider(new Octoleo\CMS\Service\SiteApplicationProvider)
+		->registerServiceProvider(new Octoleo\CMS\Service\ConfigurationProvider(LPATH_CONFIGURATION . '/octoconfig.php'))
+		->registerServiceProvider(new Joomla\Database\Service\DatabaseProvider)
+		->registerServiceProvider(new Octoleo\CMS\Service\EventProvider)
+		->registerServiceProvider(new Octoleo\CMS\Service\HttpProvider)
+		->registerServiceProvider(new Octoleo\CMS\Service\LoggingProvider)
+		->registerServiceProvider(new Joomla\Preload\Service\PreloadProvider)
+		->registerServiceProvider(new Octoleo\CMS\Service\TemplatingProvider);
 
-// Boot the DI container
-$container = \Joomla\CMS\Factory::getContainer();
+	// Alias the web application to Octoleo's base application class as this is the primary application for the environment
+	$container->alias(Joomla\Application\AbstractApplication::class, Joomla\Application\AbstractWebApplication::class);
 
-/*
- * Alias the session service keys to the web session service as that is the primary session backend for this application
- *
- * In addition to aliasing "common" service keys, we also create aliases for the PHP classes to ensure autowiring objects
- * is supported.  This includes aliases for aliased class names, and the keys for aliased class names should be considered
- * deprecated to be removed when the class name alias is removed as well.
- */
-$container->alias('session.web', 'session.web.site')
-	->alias('session', 'session.web.site')
-	->alias('JSession', 'session.web.site')
-	->alias(\Joomla\CMS\Session\Session::class, 'session.web.site')
-	->alias(\Joomla\Session\Session::class, 'session.web.site')
-	->alias(\Joomla\Session\SessionInterface::class, 'session.web.site');
+	// Alias the web logger to the PSR-3 interface as this is the primary logger for the environment
+	$container->alias(Monolog\Logger::class, 'monolog.logger.application.web')
+		->alias(Psr\Log\LoggerInterface::class, 'monolog.logger.application.web');
+}
+catch (\Throwable $e)
+{
+	error_log($e);
 
-// Instantiate the application.
-$app = $container->get(\Joomla\CMS\Application\SiteApplication::class);
+	header('HTTP/1.1 500 Internal Server Error', null, 500);
+	echo '<html><head><title>Container Initialization Error</title></head><body><h1>Container Initialization Error</h1><p>An error occurred while creating the DI container: ' . $e->getMessage() . '</p></body></html>';
 
-// Set the application as global app
-\Joomla\CMS\Factory::$application = $app;
+	exit(1);
+}
 
-// Execute the application.
-$app->execute();
+// Execute the application
+// source: https://github.com/joomla/framework.joomla.org/blob/master/www/index.php#L85
+try
+{
+	$app = $container->get(Joomla\Application\AbstractApplication::class);
+	// Set the application as global app
+	\Octoleo\CMS\Factory::$application = $app;
+	// Execute the application.
+	$app->execute();
+}
+catch (\Throwable $e)
+{
+	error_log($e);
+
+	if (!headers_sent())
+	{
+		header('HTTP/1.1 500 Internal Server Error', null, 500);
+		header('Content-Type: text/html; charset=utf-8');
+	}
+
+	echo '<html><head><title>Application Error</title></head><body><h1>Application Error</h1><p>An error occurred while executing the application: ' . $e->getMessage() . '</p></body></html>';
+
+	exit(1);
+}
+// I am just playing around... ((ewɘ))yn purring

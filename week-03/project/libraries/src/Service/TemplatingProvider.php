@@ -6,15 +6,15 @@
  * @license    http://www.gnu.org/licenses/gpl-2.0.txt GNU General Public License Version 2 or Later
  */
 
-namespace Joomla\FrameworkWebsite\Service;
+namespace Octoleo\CMS\Service;
 
 use Joomla\Application\AbstractApplication;
 use Joomla\DI\Container;
 use Joomla\DI\ServiceProviderInterface;
-use Joomla\FrameworkWebsite\Asset\MixPathPackage;
-use Joomla\FrameworkWebsite\Renderer\ApplicationContext;
-use Joomla\FrameworkWebsite\Renderer\FrameworkExtension;
-use Joomla\FrameworkWebsite\Renderer\FrameworkTwigRuntime;
+use Octoleo\CMS\Asset\MixPathPackage;
+use Octoleo\CMS\Renderer\ApplicationContext;
+use Octoleo\CMS\Renderer\FrameworkExtension;
+use Octoleo\CMS\Renderer\FrameworkTwigRuntime;
 use Joomla\Preload\PreloadManager;
 use Joomla\Renderer\RendererInterface;
 use Joomla\Renderer\TwigRenderer;
@@ -35,6 +35,7 @@ use Twig\RuntimeLoader\ContainerRuntimeLoader;
 
 /**
  * Templating service provider
+ * source: https://github.com/joomla/framework.joomla.org/blob/master/src/Service/TemplatingProvider.php
  */
 class TemplatingProvider implements ServiceProviderInterface
 {
@@ -113,7 +114,7 @@ class TemplatingProvider implements ServiceProviderInterface
 		$mixStrategy = new MixPathPackage(
 			$defaultPackage,
 			$mediaPath,
-			new JsonManifestVersionStrategy(JPATH_ROOT . '/www/media/mix-manifest.json'),
+			new JsonManifestVersionStrategy(LPATH_ROOT . '/media/mix-manifest.json'),
 			$context
 		);
 
@@ -156,7 +157,7 @@ class TemplatingProvider implements ServiceProviderInterface
 
 		if ($debug === false && $cacheEnabled !== false)
 		{
-			return new FilesystemCache(JPATH_ROOT . '/' . $cachePath);
+			return new FilesystemCache(LPATH_ROOT . '/' . $cachePath);
 		}
 
 		return new NullCache;
@@ -242,7 +243,7 @@ class TemplatingProvider implements ServiceProviderInterface
 	 */
 	public function getTwigLoaderService(Container $container): \Twig_LoaderInterface
 	{
-		return new FilesystemLoader([JPATH_TEMPLATES]);
+		return new FilesystemLoader([LPATH_TEMPLATES]);
 	}
 
 	/**
@@ -269,7 +270,7 @@ class TemplatingProvider implements ServiceProviderInterface
 		return new FrameworkTwigRuntime(
 			$container->get(AbstractApplication::class),
 			$container->get(PreloadManager::class),
-			JPATH_ROOT . '/www/media/sri-manifest.json'
+			LPATH_ROOT . '/media/sri-manifest.json'
 		);
 	}
 

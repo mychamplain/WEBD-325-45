@@ -6,7 +6,7 @@
  * @license    http://www.gnu.org/licenses/gpl-2.0.txt GNU General Public License Version 2 or Later
  */
 
-namespace Joomla\FrameworkWebsite\Renderer;
+namespace Octoleo\CMS\Renderer;
 
 use Symfony\Component\Asset\Packages;
 use Twig\Extension\AbstractExtension;
@@ -15,6 +15,7 @@ use Twig\TwigFunction;
 
 /**
  * Framework site's Twig extension class
+ * source: https://github.com/joomla/framework.joomla.org/blob/master/src/Renderer/FrameworkExtension.php
  */
 class FrameworkExtension extends AbstractExtension
 {

@@ -6,13 +6,10 @@
  * @license    GNU General Public License version 2 or later; see LICENSE.txt
  */
 
-namespace Joomla\CMS\Date;
+namespace Octoleo\CMS\Date;
 
-\defined('JPATH_PLATFORM') or die;
-
-use Joomla\CMS\Factory;
-use Joomla\CMS\Language\Text;
-use Joomla\Database\DatabaseDriver;
+use Joomla\Database\DatabaseInterface;
+use Octoleo\CMS\Factory;
 
 /**
  * Date is a class that stores a date and provides logic to manipulate
@@ -249,19 +246,19 @@ class Date extends \DateTime
 		switch ($day)
 		{
 			case 0:
-				return $abbr ? Text::_('SUN') : Text::_('SUNDAY');
+				return $abbr ? 'Sun' : 'Sunday';
 			case 1:
-				return $abbr ? Text::_('MON') : Text::_('MONDAY');
+				return $abbr ? 'Mon' : 'Monday';
 			case 2:
-				return $abbr ? Text::_('TUE') : Text::_('TUESDAY');
+				return $abbr ? 'Tue' : 'Tuesday';
 			case 3:
-				return $abbr ? Text::_('WED') : Text::_('WEDNESDAY');
+				return $abbr ? 'Wed' : 'Wednesday';
 			case 4:
-				return $abbr ? Text::_('THU') : Text::_('THURSDAY');
+				return $abbr ? 'Thu' : 'Thursday';
 			case 5:
-				return $abbr ? Text::_('FRI') : Text::_('FRIDAY');
+				return $abbr ? 'Fri' : 'Friday';
 			case 6:
-				return $abbr ? Text::_('SAT') : Text::_('SATURDAY');
+				return $abbr ? 'Sat' : 'Saturday';
 		}
 	}
 
@@ -374,29 +371,29 @@ class Date extends \DateTime
 		switch ($month)
 		{
 			case 1:
-				return $abbr ? Text::_('JANUARY_SHORT') : Text::_('JANUARY');
+				return $abbr ? 'Jan' : 'January'; //
 			case 2:
-				return $abbr ? Text::_('FEBRUARY_SHORT') : Text::_('FEBRUARY');
+				return $abbr ? 'Feb' : 'February';
 			case 3:
-				return $abbr ? Text::_('MARCH_SHORT') : Text::_('MARCH');
+				return $abbr ? 'Mar' : 'March';
 			case 4:
-				return $abbr ? Text::_('APRIL_SHORT') : Text::_('APRIL');
+				return $abbr ?  'Apr' : 'April';
 			case 5:
-				return $abbr ? Text::_('MAY_SHORT') : Text::_('MAY');
+				return 'May';
 			case 6:
-				return $abbr ? Text::_('JUNE_SHORT') : Text::_('JUNE');
+				return $abbr ? 'Jun' : 'June';
 			case 7:
-				return $abbr ? Text::_('JULY_SHORT') : Text::_('JULY');
+				return $abbr ? 'Jul' : 'July';
 			case 8:
-				return $abbr ? Text::_('AUGUST_SHORT') : Text::_('AUGUST');
+				return $abbr ? 'Aug' : 'August';
 			case 9:
-				return $abbr ? Text::_('SEPTEMBER_SHORT') : Text::_('SEPTEMBER');
+				return $abbr ? 'Sep' : 'September';
 			case 10:
-				return $abbr ? Text::_('OCTOBER_SHORT') : Text::_('OCTOBER');
+				return $abbr ? 'Oct' : 'October';
 			case 11:
-				return $abbr ? Text::_('NOVEMBER_SHORT') : Text::_('NOVEMBER');
+				return $abbr ? 'Nov' : 'November';
 			case 12:
-				return $abbr ? Text::_('DECEMBER_SHORT') : Text::_('DECEMBER');
+				return $abbr ? 'Dec' : 'December';
 		}
 	}
 
@@ -438,18 +435,20 @@ class Date extends \DateTime
 	 * Gets the date as an SQL datetime string.
 	 *
 	 * @param   boolean         $local  True to return the date string in the local time zone, false to return it in GMT.
-	 * @param   DatabaseDriver  $db     The database driver or null to use Factory::getDbo()
+	 * @param   DatabaseInterface  $db     The database driver or null to use Factory::getDbo()
 	 *
 	 * @return  string     The date string in SQL datetime format.
 	 *
-	 * @link    http://dev.mysql.com/doc/refman/5.0/en/datetime.html
+	 * @throws \Exception
 	 * @since   2.5.0
+	 * @link    http://dev.mysql.com/doc/refman/5.0/en/datetime.html
 	 */
-	public function toSql($local = false, DatabaseDriver $db = null)
+	public function toSql($local = false, DatabaseInterface $db = null)
 	{
 		if ($db === null)
 		{
-			$db = Factory::getDbo();
+			/** @var \Joomla\Database\DatabaseInterface $db */
+			$db = Factory::getContainer()->get(DatabaseInterface::class);
 		}
 
 		return $this->format($db->getDateFormat(), $local, false);

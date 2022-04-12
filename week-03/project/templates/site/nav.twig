@@ -1,0 +1,28 @@
+{% macro load_site_navbar() %}
+<nav class="uk-navbar-container" uk-navbar>
+    <div class="uk-navbar-center">
+        <ul class="uk-navbar-nav">
+            <li class="uk-active"><a href="{{ url() }}">Home</a></li>
+            <li>
+                <a href="{{ url() }}products">Products</a>
+                <div class="uk-navbar-dropdown">
+                    <ul class="uk-nav uk-navbar-dropdown-nav">
+                        <li class="uk-active"><a href="{{ url() }}products/yachts">Yachts</a></li>
+                        <li><a href="{{ url() }}products/ski-boats">Ski Boats</a></li>
+                        <li><a href="{{ url() }}products/drones">Drones</a></li>
+                    </ul>
+                </div>
+            </li>
+            <li><a href="{{ url() }}blog">Blog</a></li>
+            <li><a href="{{ url() }}about-us">About Us</a></li>
+        </ul>
+    </div>
+    <div class="uk-navbar-right">
+        <ul class="uk-navbar-nav">
+            <li><a href="{{ url() }}location">Location</a></li>
+            <li><a href="{{ url() }}contact-us">Contact Us</a></li>
+        </ul>
+    </div>
+</nav>
+{% endmacro %}
+<!-- Source: https://getuikit.com/docs/navbar -->

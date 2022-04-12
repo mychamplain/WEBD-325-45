@@ -6,7 +6,7 @@
  * @license    http://www.gnu.org/licenses/gpl-2.0.txt GNU General Public License Version 2 or Later
  */
 
-namespace Joomla\FrameworkWebsite;
+namespace Octoleo\CMS\Application;
 
 use Joomla\Application\AbstractWebApplication;
 use Joomla\Application\Controller\ControllerResolverInterface;
@@ -17,9 +17,10 @@ use Joomla\Router\RouterInterface;
 use Psr\Http\Message\ResponseInterface;
 
 /**
- * Web application class
+ * Site application class
+ * source: https://github.com/joomla/framework.joomla.org/blob/master/src/WebApplication.php
  */
-class WebApplication extends AbstractWebApplication
+class SiteApplication extends AbstractWebApplication
 {
 	/**
 	 * The application's controller resolver.

@@ -6,25 +6,23 @@
  * @license    GNU General Public License version 2 or later; see LICENSE
  */
 
-namespace Joomla\CMS\Application;
+namespace Octoleo\CMS\Application;
 
-\defined('JPATH_PLATFORM') or die;
-
-use Joomla\CMS\User\User;
-use Joomla\CMS\User\UserFactoryInterface;
+use Octoleo\CMS\User\User;
+use Octoleo\CMS\User\UserFactoryInterface;
 
 /**
  * Trait for application classes which are identity (user) aware
  *
- * @since  4.0.0
+ * @since  1.0.0
  */
-trait IdentityAware
+trait IdentityAwareTrait
 {
 	/**
 	 * The application identity object.
 	 *
 	 * @var    User
-	 * @since  4.0.0
+	 * @since  1.0.0
 	 */
 	protected $identity;
 
@@ -32,7 +30,7 @@ trait IdentityAware
 	 * UserFactoryInterface
 	 *
 	 * @var    UserFactoryInterface
-	 * @since  4.0.0
+	 * @since  1.0.0
 	 */
 	private $userFactory;
 
@@ -41,9 +39,9 @@ trait IdentityAware
 	 *
 	 * @return  User
 	 *
-	 * @since   4.0.0
+	 * @since   1.0.0
 	 */
-	public function getIdentity()
+	public function getIdentity(): User
 	{
 		return $this->identity;
 	}
@@ -53,11 +51,11 @@ trait IdentityAware
 	 *
 	 * @param   User  $identity  An optional identity object. If omitted, a null user object is created.
 	 *
-	 * @return  $this
+	 * @return  IdentityAwareInterface
 	 *
-	 * @since   4.0.0
+	 * @since   1.0.0
 	 */
-	public function loadIdentity(User $identity = null)
+	public function loadIdentity(User $identity = null): IdentityAwareInterface
 	{
 		$this->identity = $identity ?: $this->userFactory->loadUserById(0);
 
@@ -71,10 +69,23 @@ trait IdentityAware
 	 *
 	 * @return  void
 	 *
-	 * @since   4.0.0
+	 * @since   1.0.0
 	 */
 	public function setUserFactory(UserFactoryInterface $userFactory)
 	{
 		$this->userFactory = $userFactory;
 	}
+
+	/**
+	 * Get the user factory to use.
+	 *
+	 * @return  UserFactoryInterface
+	 *
+	 * @since   1.0.0
+	 */
+	public function getUserFactory(): UserFactoryInterface
+	{
+		return $this->userFactory;
+	}
 }
+
