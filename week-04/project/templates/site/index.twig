@@ -1,0 +1,12 @@
+{% extends "header.twig" %}
+
+{% block body %}
+<body id="go">
+{% block bodyNavigation %}{% import 'nav.twig' as macros  %}{{ macros.load_site_navbar() }}{% endblock %}
+<main>
+    {% block content %}{% endblock %}
+</main>
+{% block footerContent %}{% import 'footer.twig' as macros  %}{{ macros.load_footer() }}{% endblock %}
+{% block bodyJavaScript %}{% endblock %}
+</body>
+{% endblock %}

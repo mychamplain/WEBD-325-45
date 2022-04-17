@@ -1,0 +1,28 @@
+# IDE & System Related Files
+.buildpath
+.project
+.settings
+.DS_Store
+.idea
+.vscode
+.docker
+/docker-compose.yml
+/nbproject
+
+# Local System File
+/octoconfig.php
+/.htaccess
+/web.config
+/php.ini
+
+# Vendor directory handling
+/libraries/vendor
+
+# OSX
+._*
+.Spotlight-V100
+.Trashes
+
+# Windows
+Thumbs.db
+Desktop.ini
