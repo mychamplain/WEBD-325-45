@@ -31,7 +31,7 @@ class WrongCmsController extends AbstractController
 		// Enable browser caching
 		$this->getApplication()->allowCache(true);
 
-		$response = new TextResponse("This isn't the CMS you're looking for.", 404);
+		$response = new TextResponse("This isn't the what you're looking for.", 404);
 
 		$this->getApplication()->setResponse($response);
 

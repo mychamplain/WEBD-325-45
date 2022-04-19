@@ -80,6 +80,43 @@ class UserFactory implements UserFactoryInterface
 	}
 
 	/**
+	 * Method to get an instance of a user for the given id or session.
+	 *
+	 * @param   int|null  $id  The id
+	 *
+	 * @return  User
+	 *
+	 * @throws \Exception
+	 * @since   1.0.0
+	 */
+	public function getUser(?int $id = null): User
+	{
+		if (empty($id))
+		{
+			/** @var \Octoleo\CMS\Application\AdminApplication $application */
+			$application = Factory::getApplication();
+
+			$session = $application->getSession();
+
+			// Grab the current session ID
+			$sessionId = $session->getId();
+
+			// Get the session user ID
+			$query = $this->db->getQuery(true)
+				->select($this->db->quoteName('userid'))
+				->from($this->db->quoteName('#__session'))
+				->where($this->db->quoteName('session_id') . ' = :sessionid')
+				->bind(':sessionid', $sessionId)
+				->setLimit(1);
+			$this->db->setQuery($query);
+
+			$id = (int) $this->db->loadResult();
+		}
+
+		return $this->loadUserById($id);
+	}
+
+	/**
 	 * Method to get an instance of a user for the given id.
 	 *
 	 * @param   int  $id  The id
@@ -121,10 +158,12 @@ class UserFactory implements UserFactoryInterface
 	/**
 	 * Check if user is active
 	 *
+	 * @param   bool  $purge
+	 *
 	 * @return bool
 	 * @throws \Exception
 	 */
-	public function active(): bool
+	public function active(?bool $purge = true): bool
 	{
 		/** @var \Octoleo\CMS\Application\AdminApplication $application */
 		$application = Factory::getApplication();
@@ -148,27 +187,65 @@ class UserFactory implements UserFactoryInterface
 		// if user above 0 the active
 		if ($active->guest == 0 && $active->userid > 0)
 		{
-			return true;
+			// get user
+			$user = $this->loadUserById($active->userid);
+			// check if user has access
+			$blocked = $user->get('block', 1);
+			if ($blocked == 0)
+			{
+				return true;
+			}
 		}
 
-		// Purge the session
-		$query = $this->db->getQuery(true)
-			->delete($this->db->quoteName('#__session'))
-			->where($this->db->quoteName('session_id') . ' = :sessionid')
-			->bind(':sessionid', $sessionId);
-		try
+		if ($purge)
 		{
-			$this->db->setQuery($query)->execute();
-		}
-		catch (\RuntimeException $e)
-		{
-			// The old session is already invalidated, don't let this block logging in
-		}
+			// Purge the session
+			$query = $this->db->getQuery(true)
+				->delete($this->db->quoteName('#__session'))
+				->where($this->db->quoteName('session_id') . ' = :sessionid')
+				->bind(':sessionid', $sessionId);
+			try
+			{
+				$this->db->setQuery($query)->execute();
+			}
+			catch (\RuntimeException $e)
+			{
+				// The old session is already invalidated, don't let this block logging in
+			}
 
-		// destroy session
-		$session->destroy();
+			// destroy session
+			$session->destroy();
+		}
 
 		// very basic for now....
+		return false;
+	}
+
+	/**
+	 * Check if we have users
+	 *
+	 * @return bool true if we have
+	 */
+	public function has(): bool
+	{
+		try
+		{
+			$found = $this->db->setQuery(
+				$this->db->getQuery(true)
+					->select($this->db->quoteName('id'))
+					->from($this->db->quoteName('#__users'))
+					->setLimit(1)
+			)->loadResult();
+		}
+		catch (\RuntimeException $exception)
+		{
+			return false;
+		}
+
+		if ($found > 0)
+		{
+			return true;
+		}
 		return false;
 	}
 
@@ -242,9 +319,10 @@ class UserFactory implements UserFactoryInterface
 			}
 
 			// If loadUserByUsername returned an error, then pass it back.
-			if ($user->get('block', true))
+			$blocked = $user->get('block', 1);
+			if ($blocked == 1)
 			{
-				$application->enqueueMessage('Login failure, user is blocked.', 'Warning');
+				$application->enqueueMessage('Login failure, user is blocked. Contact your system administrator.', 'Warning');
 
 				return false;
 			}
@@ -287,8 +365,8 @@ class UserFactory implements UserFactoryInterface
 			// The old session is already invalidated, don't let this block logging in
 		}
 
-		// destroy session
-		$session->destroy();
+		// close session
+		$session->close();
 
 		// very basic for now....
 		return true;
@@ -388,7 +466,16 @@ class UserFactory implements UserFactoryInterface
 
 			// set other defaults for now
 			$user['sendEmail'] = 1;
-			$user['block'] = 0;
+			// all auto created accounts are blocked (and require admin activation) except for first account
+			if ($this->has())
+			{
+				$user['block'] = 1;
+			}
+			else
+			{
+				$user['block'] = 0;
+			}
+			// there are no params at this stage
 			$user['params'] = '';
 
 			$insert = (object) $user;
@@ -405,11 +492,15 @@ class UserFactory implements UserFactoryInterface
 				return false;
 			}
 
-			// only set session if success
-			if ($result)
+			// only set session if success and not blocked
+			if ($result && $user['block'] == 0)
 			{
 				$user['id'] = $this->db->insertid();
 				return $this->setUserSession($application, $user);
+			}
+			elseif ($result)
+			{
+				$application->enqueueMessage('You account has been created, an administrator will active it shortly.', 'success');
 			}
 		}
 		return false;
@@ -475,6 +566,9 @@ class UserFactory implements UserFactoryInterface
 		$manager = Factory::getContainer()->get(MetadataManager::class);
 
 		$manager->createOrUpdateRecord($session, $this->loadUserById($user['id']));
+
+		// show a success message
+		$application->enqueueMessage('Welcome ' . $user['name'] . ', you have successfully lodged in!', 'Success');
 
 		return true;
 	}

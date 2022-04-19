@@ -43,14 +43,15 @@ class ConfigurationProvider implements ServiceProviderInterface
 		$this->config = new Registry(new \LConfig());
 
 		// Set database values based on config values
-		$this->config->loadObject( (object) ['database' => [
-			'driver' => 'mysql',
-			'host' => $this->config->get('host'),
-			'port' => $this->config->get('port', ''),
-			'user' => $this->config->get('user'),
-			'password' => $this->config->get('password'),
-			'database' => $this->config->get('db'),
-			'prefix' => $this->config->get('dbprefix')
+		$this->config->loadObject( (object) [
+		    'database' => [
+				'driver' => $this->config->get('dbdriver'),
+				'host' => $this->config->get('host'),
+				'port' => $this->config->get('port', ''),
+				'user' => $this->config->get('user'),
+				'password' => $this->config->get('password'),
+				'database' => $this->config->get('db'),
+				'prefix' => $this->config->get('dbprefix')
 			]
 		]);
 	}

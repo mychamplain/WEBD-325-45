@@ -31,19 +31,19 @@ class DashboardHtmlView extends HtmlView
 	 *
 	 * @var  DashboardModel
 	 */
-	private $dashboardModel;
+	private $model;
 
 	/**
 	 * Instantiate the view.
 	 *
-	 * @param   DashboardModel     $dashboardModel   The page model object.
-	 * @param   RendererInterface  $renderer         The renderer object.
+	 * @param   DashboardModel     $model       The page model object.
+	 * @param   RendererInterface  $renderer    The renderer object.
 	 */
-	public function __construct(DashboardModel $dashboardModel, RendererInterface $renderer)
+	public function __construct(DashboardModel $model, RendererInterface $renderer)
 	{
 		parent::__construct($renderer);
 
-		$this->dashboardModel = $dashboardModel;
+		$this->model = $model;
 	}
 
 	/**
@@ -51,7 +51,7 @@ class DashboardHtmlView extends HtmlView
 	 *
 	 * @return  string  The rendered view
 	 */
-	public function render()
+	public function render(): string
 	{
 		$this->setData(['page' => $this->id]);
 		return parent::render();
@@ -66,7 +66,7 @@ class DashboardHtmlView extends HtmlView
 	 */
 	public function setActiveDashboard(string $name): void
 	{
-		$this->setLayout($this->dashboardModel->getDashboard($name));
+		$this->setLayout($this->model->getDashboard($name));
 	}
 
 	/**

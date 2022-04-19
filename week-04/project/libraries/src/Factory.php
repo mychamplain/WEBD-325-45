@@ -147,6 +147,7 @@ abstract class Factory
 			->registerServiceProvider(new Service\ConfigurationProvider(LPATH_CONFIGURATION . '/octoconfig.php'))
 			->registerServiceProvider(new Service\SessionProvider)
 			->registerServiceProvider(new Service\UserProvider)
+			->registerServiceProvider(new Service\InputProvider)
 			->registerServiceProvider(new DatabaseProvider)
 			->registerServiceProvider(new Service\EventProvider)
 			->registerServiceProvider(new Service\HttpProvider)

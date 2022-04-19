@@ -10,6 +10,7 @@ namespace Octoleo\CMS\Renderer;
 
 use Joomla\Application\AbstractApplication;
 use Joomla\Preload\PreloadManager;
+use Joomla\Session\SessionInterface;
 
 /**
  * Twig runtime class
@@ -46,14 +47,21 @@ class FrameworkTwigRuntime
 	private $sriManifestPath;
 
 	/**
+	 * @var SessionInterface
+	 */
+	private $session;
+
+	/**
 	 * Constructor
 	 *
-	 * @param   AbstractApplication  $app              The application object
-	 * @param   PreloadManager       $preloadManager   The HTTP/2 preload manager
-	 * @param   string               $sriManifestPath  The path to the SRI manifest data
+	 * @param   AbstractApplication    $app              The application object
+	 * @param   PreloadManager         $preloadManager   The HTTP/2 preload manager
+	 * @param   string                 $sriManifestPath  The path to the SRI manifest data
+	 * @param   SessionInterface|null  $session          The session object
 	 */
-	public function __construct(AbstractApplication $app, PreloadManager $preloadManager, string $sriManifestPath)
+	public function __construct(AbstractApplication $app, PreloadManager $preloadManager, string $sriManifestPath, $session = null)
 	{
+		$this->session         = $session;
 		$this->app             = $app;
 		$this->preloadManager  = $preloadManager;
 		$this->sriManifestPath = $sriManifestPath;
@@ -91,6 +99,68 @@ class FrameworkTwigRuntime
 	public function getRouteUrl(string $route = ''): string
 	{
 		return $this->app->get('uri.base.host') . $this->getRouteUri($route);
+	}
+
+	/**
+	 * Get form Token
+	 *
+	 * @return  string
+	 */
+	public function getToken(): string
+	{
+		if ($this->session instanceof SessionInterface)
+		{
+			return $this->session->getToken();
+		}
+		return '';
+	}
+
+	/**
+	 * Shorten a string
+	 *
+	 * @input	string   The you would like to shorten
+	 *
+	 * @returns string on success
+	 *
+	 * @since  1.0.0
+	 */
+	public function shortenString($string, $length = 100)
+	{
+		if (is_string($string) && strlen($string) > $length)
+		{
+			$initial = strlen($string);
+			$words = preg_split('/([\s\n\r]+)/', $string, null, PREG_SPLIT_DELIM_CAPTURE);
+			$words_count = count((array)$words);
+
+			$word_length = 0;
+			$last_word = 0;
+			for (; $last_word < $words_count; ++$last_word)
+			{
+				$word_length += strlen($words[$last_word]);
+				if ($word_length > $length)
+				{
+					break;
+				}
+			}
+
+			$newString	= implode(array_slice($words, 0, $last_word));
+			return trim($newString) . '...';
+		}
+		return $string;
+	}
+
+	/**
+	 * Get any messages in the queue
+	 *
+	 * @return  array
+	 */
+	public function getMessageQueue(): array
+	{
+		if (method_exists($this->app, 'getMessageQueue'))
+		{
+			return $this->app->getMessageQueue(true);
+		}
+		return [];
 	}
 
 	/**

@@ -13,8 +13,8 @@ namespace Octoleo\CMS\Controller;
 use Joomla\Application\AbstractApplication;
 use Joomla\Controller\AbstractController;
 use Joomla\Input\Input;
-use Joomla\Renderer\RendererInterface;
 use Laminas\Diactoros\Response\HtmlResponse;
+use Octoleo\CMS\View\Page\HomepageHtmlView;
 
 /**
  * Controller handling the site's homepage
@@ -25,24 +25,24 @@ use Laminas\Diactoros\Response\HtmlResponse;
 class HomepageController extends AbstractController
 {
 	/**
-	 * The template renderer.
+	 * The view object.
 	 *
-	 * @var  RendererInterface
+	 * @var  HomepageHtmlView
 	 */
-	private $renderer;
+	private $view;
 
 	/**
 	 * Constructor.
 	 *
-	 * @param   RendererInterface    $renderer  The template renderer.
+	 * @param   HomepageHtmlView     $view      The view object.
 	 * @param   Input                $input     The input object.
 	 * @param   AbstractApplication  $app       The application object.
 	 */
-	public function __construct(RendererInterface $renderer, Input $input = null, AbstractApplication $app = null)
+	public function __construct(HomepageHtmlView $view, Input $input = null, AbstractApplication $app = null)
 	{
 		parent::__construct($input, $app);
 
-		$this->renderer = $renderer;
+		$this->view = $view;
 	}
 
 	/**
@@ -52,10 +52,11 @@ class HomepageController extends AbstractController
 	 */
 	public function execute(): bool
 	{
-		// Enable browser caching
-		$this->getApplication()->allowCache(true);
+		// Disable all cache for now
+		$this->getApplication()->allowCache(false);
 
-		$this->getApplication()->setResponse(new HtmlResponse($this->renderer->render('homepage.twig')));
+		// check if there is a home page
+		$this->getApplication()->setResponse(new HtmlResponse($this->view->render()));
 
 		return true;
 	}

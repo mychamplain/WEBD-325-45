@@ -11,6 +11,7 @@ namespace Octoleo\CMS\Service;
 use Joomla\Application\AbstractApplication;
 use Joomla\DI\Container;
 use Joomla\DI\ServiceProviderInterface;
+use Joomla\Session\SessionInterface;
 use Octoleo\CMS\Asset\MixPathPackage;
 use Octoleo\CMS\Renderer\ApplicationContext;
 use Octoleo\CMS\Renderer\FrameworkExtension;
@@ -37,7 +38,7 @@ use Twig\RuntimeLoader\ContainerRuntimeLoader;
  * Templating service provider
  * source: https://github.com/joomla/framework.joomla.org/blob/master/src/Service/TemplatingProvider.php
  */
-class TemplatingProvider implements ServiceProviderInterface
+class AdminTemplatingProvider implements ServiceProviderInterface
 {
 	/**
 	 * Registers the service provider with a DI container.
@@ -270,7 +271,8 @@ class TemplatingProvider implements ServiceProviderInterface
 		return new FrameworkTwigRuntime(
 			$container->get(AbstractApplication::class),
 			$container->get(PreloadManager::class),
-			LPATH_ROOT . '/media/sri-manifest.json'
+			LPATH_ROOT . '/media/sri-manifest.json',
+			$container->get(SessionInterface::class)
 		);
 	}
 

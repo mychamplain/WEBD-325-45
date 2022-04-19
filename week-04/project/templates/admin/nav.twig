@@ -1,19 +1,18 @@
-{% macro load_admin_navbar() %}
+{% block bodyNavigation %}
 <nav class="uk-navbar-container" uk-navbar>
     <div class="uk-navbar-left">
         <ul class="uk-navbar-nav">
-            <li><a href="{{ url() }}index.php?dashboard">Dashboard</a></li>
-            <li><a href="{{ url() }}index.php?dashboard=users">Users</a></li>
-            <li><a href="{{ url() }}index.php?dashboard=menus">Menus</a></li>
-            <li><a href="{{ url() }}index.php?dashboard=items">Items</a></li>
+            <li><a href="{{ route() }}index.php/dashboard">Dashboard</a></li>
+            <li><a href="{{ route() }}index.php/users">Users</a></li>
+            <li><a href="{{ route() }}index.php/menus">Menus</a></li>
+            <li><a href="{{ route() }}index.php/items">Items</a></li>
         </ul>
     </div>
     <div class="uk-navbar-right">
         <ul class="uk-navbar-nav">
-            <li class="uk-active"><a href="{{ url() }}index.php?dashboard=logout">Logout</a></li>
+            <li class="uk-active"><a href="{{ route() }}index.php/dashboard?task=logout">Logout</a></li>
             <li class="uk-active"><a href="/">Site</a></li>
         </ul>
     </div>
 </nav>
-{% endmacro %}
-<!-- Source: https://getuikit.com/docs/navbar -->
+{% endblock %}

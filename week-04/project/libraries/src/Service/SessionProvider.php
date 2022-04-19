@@ -10,7 +10,6 @@
 
 namespace Octoleo\CMS\Service;
 
-use Joomla\Application\AbstractWebApplication;
 use Joomla\Database\DatabaseInterface;
 use Joomla\DI\Container;
 use Joomla\DI\ServiceProviderInterface;

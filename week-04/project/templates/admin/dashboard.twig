@@ -5,15 +5,16 @@
 {% block content %}
 <div class="uk-container uk-margin">
     <h1 class="uk-article-title">Octoleo CMS Dashboard</h1>
+    {{ block("messages_queue", "message_queue.twig") }}
     <div class="uk-grid-small uk-child-width-expand@s uk-text-center" uk-grid>
         <div>
-            <div class="uk-card uk-card-default uk-card-body"><a href="{{ url() }}index.php?dashboard=users">Users</a></div>
+            <div class="uk-card uk-card-default uk-card-body"><a href="{{ route() }}index.php/users">Users</a></div>
         </div>
         <div>
-            <div class="uk-card uk-card-default uk-card-body"><a href="{{ url() }}index.php?dashboard=menus">Menus</a></div>
+            <div class="uk-card uk-card-default uk-card-body"><a href="{{ route() }}index.php/menus">Menus</a></div>
         </div>
         <div>
-            <div class="uk-card uk-card-default uk-card-body"><a href="{{ url() }}index.php?dashboard=items">Items</a></div>
+            <div class="uk-card uk-card-default uk-card-body"><a href="{{ route() }}index.php/items">Items</a></div>
         </div>
     </div>
 </div>

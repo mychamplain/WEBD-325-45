@@ -14,18 +14,19 @@ use Joomla\Application\AbstractApplication;
 use Joomla\Controller\AbstractController;
 use Joomla\Input\Input;
 use Joomla\Uri\Uri;
-use Laminas\Diactoros\Response\RedirectResponse;
 use Octoleo\CMS\View\Admin\DashboardHtmlView;
 use Laminas\Diactoros\Response\HtmlResponse;
 
 /**
- * Controller handling the site's homepage
+ * Controller handling the site's dashboard
  *
  * @method         \Octoleo\CMS\Application\AdminApplication  getApplication()  Get the application object.
  * @property-read  \Octoleo\CMS\Application\AdminApplication  $app              Application object
  */
-class DashboardController extends AbstractController
+class DashboardController extends AbstractController implements AccessInterface, CheckTokenInterface
 {
+	use AccessTrait, CheckTokenTrait;
+
 	/**
 	 * The view object.
 	 *
@@ -36,10 +37,10 @@ class DashboardController extends AbstractController
 	/**
 	 * Constructor.
 	 *
-	 * @param   DashboardHtmlView    $view      The view object.
-	 * @param   Input                $user      The user object.
-	 * @param   Input                $input     The input object.
-	 * @param   AbstractApplication  $app       The application object.
+	 * @param   DashboardHtmlView    $view   The view object.
+	 * @param   Input                $user   The user object.
+	 * @param   Input                $input  The input object.
+	 * @param   AbstractApplication  $app    The application object.
 	 */
 	public function __construct(DashboardHtmlView $view, Input $input = null, AbstractApplication $app = null)
 	{
@@ -56,56 +57,30 @@ class DashboardController extends AbstractController
 	 */
 	public function execute(): bool
 	{
-		// our little access controller TODO: we can do better
-		$has_access = false;
+		// Do not Enable browser caching
+		$this->getApplication()->allowCache(false);
 
-		// Enable browser caching
-		$this->getApplication()->allowCache(true);
-
-		$dashboard = $this->getInput()->getString('dashboard', '');
+		$task = $this->getInput()->getString('task', '');
 		$id = $this->getInput()->getInt('id', 0);
 
-		$this->view->setActiveDashboard($dashboard);
+		$this->view->setActiveDashboard($task);
 		$this->view->setActiveId($id);
 
-		/** @var \Octoleo\CMS\User\UserFactory $userFactory */
-		$userFactory = $this->getApplication()->getUserFactory();
-
-		// user actions [access, signup]
-		if ('access' === $dashboard || 'signup' === $dashboard || 'logout' === $dashboard)
+		// validate form token
+		if ('access' === $task || 'signup' === $task)
 		{
-			if ('access' === $dashboard && $userFactory->login())
-			{
-				$has_access = true;
-			}
-			elseif ('signup' === $dashboard && $userFactory->create())
-			{
-				$has_access = true;
-			}
-			elseif ('logout' === $dashboard && $userFactory->logout())
-			{
-				$has_access = false;
-			}
-
-			// we by default always load the dashboard
-			$this->view->setActiveDashboard('dashboard');
-		}
-		elseif ($userFactory->active())
-		{
-			$has_access = true;
+			$this->checkToken();
 		}
 
-		if ($has_access)
+		// check if user is allowed to access
+		if ($this->allow($task))
 		{
 			$this->getApplication()->setResponse(new HtmlResponse($this->view->render()));
 		}
 		else
 		{
-			// get uri request to get host
-			$uri = new Uri($this->getApplication()->get('uri.request'));
-
-			// Redirect to the administrator area
-			$this->getApplication()->redirect($uri->getScheme() . '://' . $uri->getHost() . '/administrator/');
+			// go to set page
+			$this->_redirect();
 		}
 
 		return true;

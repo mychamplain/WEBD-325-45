@@ -22,7 +22,9 @@ use Joomla\Event\DispatcherInterface;
 use Octoleo\CMS\Controller\HomepageController;
 use Octoleo\CMS\Controller\WrongCmsController;
 use Octoleo\CMS\Controller\PageController;
+use Octoleo\CMS\Model\HomepageModel;
 use Octoleo\CMS\Model\PageModel;
+use Octoleo\CMS\View\Page\HomepageHtmlView;
 use Octoleo\CMS\View\Page\PageHtmlView;
 use Octoleo\CMS\Application\SiteApplication;
 
@@ -71,8 +73,6 @@ class SiteApplicationProvider implements ServiceProviderInterface
 			->alias(Router::class, 'application.router')
 			->share('application.router', [$this, 'getApplicationRouterService']);
 
-		$container->share(Input::class, [$this, 'getInputClassService'], true);
-
 		/*
 		 * MVC Layer
 		 */
@@ -88,10 +88,16 @@ class SiteApplicationProvider implements ServiceProviderInterface
 			->share('controller.wrong.cms', [$this, 'getControllerWrongCmsService'], true);
 
 		// Models
+		$container->alias(HomepageModel::class, 'model.homepage')
+			->share('model.homepage', [$this, 'getModelHomepageService'], true);
+
 		$container->alias(PageModel::class, 'model.page')
 			->share('model.page', [$this, 'getModelPageService'], true);
 
 		// Views
+		$container->alias(HomepageHtmlView::class, 'view.homepage.html')
+			->share('view.homepage.html', [$this, 'getViewHomepageHtmlService'], true);
+
 		$container->alias(PageHtmlView::class, 'view.page.html')
 			->share('view.page.html', [$this, 'getViewPageHtmlService'], true);
 	}
@@ -135,16 +141,6 @@ class SiteApplicationProvider implements ServiceProviderInterface
 			PageController::class
 		);
 
-		$router->get(
-			'/:view',
-			PageController::class
-		);
-
-		$router->get(
-			'/:view/:details',
-			PageController::class
-		);
-
 		return $router;
 	}
 
@@ -158,7 +154,7 @@ class SiteApplicationProvider implements ServiceProviderInterface
 	public function getControllerHomepageService(Container $container): HomepageController
 	{
 		return new HomepageController(
-			$container->get(RendererInterface::class),
+			$container->get(HomepageHtmlView::class),
 			$container->get(Input::class),
 			$container->get(SiteApplication::class)
 		);
@@ -196,15 +192,15 @@ class SiteApplicationProvider implements ServiceProviderInterface
 	}
 
 	/**
-	 * Get the Input class service
+	 * Get the `model.homepage` service
 	 *
 	 * @param   Container  $container  The DI container.
 	 *
-	 * @return  Input
+	 * @return  HomepageModel
 	 */
-	public function getInputClassService(Container $container): Input
+	public function getModelHomepageService(Container $container): HomepageModel
 	{
-		return new Input($_REQUEST);
+		return new HomepageModel($container->get(DatabaseInterface::class));
 	}
 
 	/**
@@ -255,6 +251,21 @@ class SiteApplicationProvider implements ServiceProviderInterface
 	public function getControllerResolverService(Container $container): ControllerResolverInterface
 	{
 		return new ContainerControllerResolver($container);
+	}
+
+	/**
+	 * Get the `view.homepage.html` service
+	 *
+	 * @param   Container  $container  The DI container.
+	 *
+	 * @return  HomepageHtmlView
+	 */
+	public function getViewHomepageHtmlService(Container $container): HomepageHtmlView
+	{
+		return new HomepageHtmlView(
+			$container->get('model.homepage'),
+			$container->get('renderer')
+		);
 	}
 
 	/**

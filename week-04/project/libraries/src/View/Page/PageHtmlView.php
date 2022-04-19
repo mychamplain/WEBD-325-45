@@ -10,6 +10,8 @@
 
 namespace Octoleo\CMS\View\Page;
 
+use Octoleo\CMS\Model\MenuInterface;
+use Octoleo\CMS\Model\PageInterface;
 use Octoleo\CMS\Model\PageModel;
 use Joomla\Renderer\RendererInterface;
 use Joomla\View\HtmlView;
@@ -38,19 +40,19 @@ class PageHtmlView extends HtmlView
 	 *
 	 * @var  PageModel
 	 */
-	private $pageModel;
+	private $model;
 
 	/**
 	 * Instantiate the view.
 	 *
-	 * @param   PageModel          $pageModel     The page model object.
-	 * @param   RendererInterface  $renderer         The renderer object.
+	 * @param   PageModel          $model     The page model object.
+	 * @param   RendererInterface  $renderer  The renderer object.
 	 */
-	public function __construct(PageModel $pageModel, RendererInterface $renderer)
+	public function __construct(PageModel $model, RendererInterface $renderer)
 	{
 		parent::__construct($renderer);
 
-		$this->pageModel = $pageModel;
+		$this->model = $model;
 	}
 
 	/**
@@ -60,10 +62,45 @@ class PageHtmlView extends HtmlView
 	 */
 	public function render()
 	{
+		// set the defaults
+		$title = 'Error';
+		$body = '';
+		$menus = [];
+		// get the page data
+		if ($this->model instanceof PageInterface)
+		{
+			// get the page data
+			$data = $this->model->getPageItemByPath($this->page);
+			if (isset($data->id))
+			{
+				// set the title
+				$title = $data->title;
+				// check if we have intro text we add it to full text
+				if (!empty($data->introtext))
+				{
+					// TODO: for now we just merge these
+					$data->fulltext = $data->introtext . $data->fulltext;
+				}
+				// set the title
+				$body = $data->fulltext;
+			}
+			else
+			{
+				throw new \RuntimeException('Trying to access a page that does not exit (' . $this->page . ')', 404);
+			}
+		}
+
+		// set the menus if possible
+		if ($this->model instanceof MenuInterface)
+		{
+			$menus = $this->model->getMenus();
+		}
+
 		$this->setData(
 			[
-				'page' => $this->pageModel->getPage($this->page),
-				'details' => $this->pageModel->getDetails($this->details)
+				'main_menu' => $menus,
+				'title' => $title,
+				'body' => $body
 			]
 		);
 
@@ -80,17 +117,5 @@ class PageHtmlView extends HtmlView
 	public function setPage(string $page): void
 	{
 		$this->page = $page;
-	}
-
-	/**
-	 * Set the active page details
-	 *
-	 * @param   string  $page  The active page name
-	 *
-	 * @return  void
-	 */
-	public function setDetails(string $details): void
-	{
-		$this->details = $details;
 	}
 }

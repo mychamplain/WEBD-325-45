@@ -36,7 +36,7 @@ class PageController extends AbstractController
 	/**
 	 * Constructor.
 	 *
-	 * @param   PageHtmlView         $view   The view object.
+	 * @param   PageHtmlView         $view      The view object.
 	 * @param   Input                $input     The input object.
 	 * @param   AbstractApplication  $app       The application object.
 	 */
@@ -54,8 +54,8 @@ class PageController extends AbstractController
 	 */
 	public function execute(): bool
 	{
-		// Enable browser caching
-		$this->getApplication()->allowCache(true);
+		// Disable all cache for now
+		$this->getApplication()->allowCache(false);
 
 		$page = $this->getInput()->getString('view', '');
 		$details = $this->getInput()->getString('details', '');
@@ -72,7 +72,6 @@ class PageController extends AbstractController
 		else
 		{
 			$this->view->setPage($page);
-			$this->view->setDetails($details);
 
 			$this->getApplication()->setResponse(new HtmlResponse($this->view->render()));
 		}

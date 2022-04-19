@@ -2,7 +2,7 @@
 
 {% block body %}
 <body id="go">
-{% block bodyNavigation %}{% import 'nav.twig' as macros  %}{{ macros.load_admin_navbar() }}{% endblock %}
+{% block bodyNavigation %}{{ block("bodyNavigation", "nav.twig") }}{% endblock %}
 <main>
     {% block content %}{% endblock %}
 </main>

@@ -44,12 +44,13 @@ try
 	$container = (new Joomla\DI\Container)
 		->registerServiceProvider(new Octoleo\CMS\Service\SiteApplicationProvider)
 		->registerServiceProvider(new Octoleo\CMS\Service\ConfigurationProvider(LPATH_CONFIGURATION . '/octoconfig.php'))
+		->registerServiceProvider(new Octoleo\CMS\Service\InputProvider)
 		->registerServiceProvider(new Joomla\Database\Service\DatabaseProvider)
 		->registerServiceProvider(new Octoleo\CMS\Service\EventProvider)
 		->registerServiceProvider(new Octoleo\CMS\Service\HttpProvider)
 		->registerServiceProvider(new Octoleo\CMS\Service\LoggingProvider)
 		->registerServiceProvider(new Joomla\Preload\Service\PreloadProvider)
-		->registerServiceProvider(new Octoleo\CMS\Service\TemplatingProvider);
+		->registerServiceProvider(new Octoleo\CMS\Service\SiteTemplatingProvider);
 
 	// Alias the web application to Octoleo's base application class as this is the primary application for the environment
 	$container->alias(Joomla\Application\AbstractApplication::class, Joomla\Application\AbstractWebApplication::class);
