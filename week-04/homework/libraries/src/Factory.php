@@ -148,8 +148,6 @@ abstract class Factory
 	{
 		return (new Container)
 			->registerServiceProvider(new Service\ConfigurationProvider(LPATH_CONFIGURATION . '/octoconfig.php'))
-			->registerServiceProvider(new Service\SessionProvider)
-			->registerServiceProvider(new Service\UserProvider)
 			->registerServiceProvider(new Service\InputProvider)
 			->registerServiceProvider(new DatabaseProvider)
 			->registerServiceProvider(new Service\EventProvider)

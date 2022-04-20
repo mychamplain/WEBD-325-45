@@ -36,5 +36,6 @@ class LConfig
 	public $user = '';                       // Database username
 	public $password = '';                   // Database password
 	public $db = '';                         // Database name
-	public $dbprefix = 'llewellyn_';         // LEAVE THIS UNCHANGED FOR NOW
+	public $dbprefix = 'homework_';          // LEAVE THIS UNCHANGED FOR NOW
 }
+

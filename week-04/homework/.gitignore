@@ -3,17 +3,8 @@
 
 # Local System File
 config.php
-web.config
 php.ini
 
 # Vendor directory handling
 /libraries/vendor
 
-# OSX
-._*
-.Spotlight-V100
-.Trashes
-
-# Windows
-Thumbs.db
-Desktop.ini

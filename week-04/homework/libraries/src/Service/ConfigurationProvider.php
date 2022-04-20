@@ -47,7 +47,7 @@ class ConfigurationProvider implements ServiceProviderInterface
 		// Set database values based on config values
 		$this->config->loadObject( (object) [
 		    'database' => [
-				'driver' => $this->config->get('dbdriver'),
+				'driver' => $this->config->get('dbtype'),
 				'host' => $this->config->get('host'),
 				'port' => $this->config->get('port', ''),
 				'user' => $this->config->get('user'),

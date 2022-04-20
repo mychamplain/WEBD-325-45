@@ -6,10 +6,9 @@
  * @license    GNU General Public License version 2 or later; see LICENSE.txt
  */
 
-namespace Sport\Stars\Session;
+namespace Octoleo\CMS\Session;
 
-use RuntimeException;
-use Sport\Stars\User\User;
+use Octoleo\CMS\User\User;
 use Joomla\Database\DatabaseInterface;
 use Joomla\Database\Exception\ExecutionFailureException;
 use Joomla\Database\ParameterType;
@@ -79,7 +78,7 @@ final class MetadataManager
 	 * @return  void
 	 *
 	 * @since   3.8.6
-	 * @throws  RuntimeException
+	 * @throws  \RuntimeException
 	 */
 	public function createRecordIfNonExisting(SessionInterface $session, User $user)
 	{
@@ -103,7 +102,7 @@ final class MetadataManager
 	 * @return  void
 	 *
 	 * @since   4.0.0
-	 * @throws  RuntimeException
+	 * @throws  \RuntimeException
 	 */
 	public function createOrUpdateRecord(SessionInterface $session, User $user)
 	{

@@ -13,11 +13,10 @@ namespace Sport\Stars\Controller;
 use Exception;
 use Joomla\Application\AbstractApplication;
 use Joomla\Controller\AbstractController;
-use Joomla\Filter\InputFilter as InputFilterAlias;
 use Joomla\Input\Input;
+use Joomla\String\StringHelper;
 use Joomla\Uri\Uri;
 use Sport\Stars\Application\SportStarsApplication;
-use Sport\Stars\Filter\InputFilter;
 use Sport\Stars\Model\EditModel;
 use Sport\Stars\View\EditHtmlView;
 use Laminas\Diactoros\Response\HtmlResponse;
@@ -127,7 +126,7 @@ class EditController extends AbstractController
 
 		// check that we have a Title
 		$can_save = true;
-		if (empty($tempItem['name']) || is_numeric($tempItem['name']))
+		if (empty($tempItem['name']) || is_numeric($tempItem['name']) || StringHelper::strlen($tempItem['name']) > 100)
 		{
 			// we show a warning message
 			$tempItem['name'] = '';
@@ -143,7 +142,7 @@ class EditController extends AbstractController
 			$can_save = false;
 		}
 		// we actually can also not continue if we don't have sport
-		if (empty($tempItem['sport']) || is_numeric($tempItem['sport']))
+		if (empty($tempItem['sport']) || is_numeric($tempItem['sport']) || StringHelper::strlen($tempItem['sport']) > 100)
 		{
 			// we show a warning message
 			$tempItem['sport'] = '';

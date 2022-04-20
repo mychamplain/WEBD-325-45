@@ -8,7 +8,7 @@ PHP Web Application for a sport stars details
 2. Copy the /config.php.example file to /config.php
 3. Update the /config.php to reflect your CMS details
 4. Copy the /htaccess.txt file to /.htaccess
-5. **Remove the installation folder** from you root directory
+5. **Remove** the /installation folder from you root directory
 
 ## To install all composer libraries
 
