@@ -6,11 +6,10 @@
  * @license    http://www.gnu.org/licenses/gpl-2.0.txt GNU General Public License Version 2 or Later
  */
 
-namespace Sport\Stars\Service;
+namespace Change\Calculator\Service;
 
 use Joomla\DI\Container;
 use Joomla\DI\ServiceProviderInterface;
-use Joomla\Registry\Registry;
 use Monolog\Handler\StreamHandler;
 use Monolog\Logger;
 use Monolog\Processor\PsrLogMessageProcessor;
@@ -59,10 +58,7 @@ class LoggingProvider implements ServiceProviderInterface
 	 */
 	public function getMonologHandlerApplicationService(Container $container): StreamHandler
 	{
-		/** @var Registry $config */
-		$config = $container->get('config');
-
-		$level = strtoupper($config->get('log.application', $config->get('log.level', 'error')));
+		$level = 'ERROR';
 
 		return new StreamHandler(LPATH_ROOT . '/logs/framework.log', constant('\\Monolog\\Logger::' . $level));
 	}

@@ -1,19 +1,17 @@
 <?php
 /**
- * @package    Sport Stars
+ * @package    Change Calculator
  *
- * @created    19th April 2022
+ * @created    24th April 2022
  * @author     Llewellyn van der Merwe <https://git.vdm.dev/Llewellyn>
  * @git        WEBD-325-45 <https://git.vdm.dev/Llewellyn/WEBD-325-45>
  * @license    GNU General Public License version 2 or later; see LICENSE.txt
  */
 
-namespace Sport\Stars\Application;
+namespace Change\Calculator\Application;
 
 use Joomla\Application\AbstractWebApplication;
 use Joomla\Application\Controller\ControllerResolverInterface;
-use Joomla\Application\SessionAwareWebApplicationInterface;
-use Joomla\Application\SessionAwareWebApplicationTrait;
 use Joomla\Application\Web\WebClient;
 use Joomla\Input\Input;
 use Joomla\Registry\Registry;
@@ -25,9 +23,8 @@ use function call_user_func;
  * Site application class
  * source: https://github.com/joomla/framework.joomla.org/blob/master/src/WebApplication.php
  */
-class SportStarsApplication extends AbstractWebApplication implements SessionAwareWebApplicationInterface
+class ChangeCalculatorApplication extends AbstractWebApplication
 {
-	use SessionAwareWebApplicationTrait;
 
 	/**
 	 * The application's controller resolver.
@@ -48,20 +45,17 @@ class SportStarsApplication extends AbstractWebApplication implements SessionAwa
 	 *
 	 * @param   ControllerResolverInterface  $controllerResolver  The application's controller resolver
 	 * @param   RouterInterface              $router              The application's router
-	 * @param   Input                        $input               An optional argument to provide dependency injection for the application's
+	 * @param   Input|null                   $input               An optional argument to provide dependency injection for the application's
 	 *                                                            input object.
-	 * @param   Registry                     $config              An optional argument to provide dependency injection for the application's
-	 *                                                            config object.
-	 * @param   WebClient                    $client              An optional argument to provide dependency injection for the application's
+	 * @param   WebClient|null               $client              An optional argument to provide dependency injection for the application's
 	 *                                                            client object.
-	 * @param   ResponseInterface            $response            An optional argument to provide dependency injection for the application's
+	 * @param   ResponseInterface|null       $response            An optional argument to provide dependency injection for the application's
 	 *                                                            response object.
 	 */
 	public function __construct(
 		ControllerResolverInterface $controllerResolver,
 		RouterInterface $router,
 		Input $input = null,
-		Registry $config = null,
 		WebClient $client = null,
 		ResponseInterface $response = null
 	)
@@ -70,7 +64,7 @@ class SportStarsApplication extends AbstractWebApplication implements SessionAwa
 		$this->router             = $router;
 
 		// Call the constructor as late as possible (it runs `initialise`).
-		parent::__construct($input, $config, $client, $response);
+		parent::__construct($input, null, $client, $response);
 	}
 
 	/**

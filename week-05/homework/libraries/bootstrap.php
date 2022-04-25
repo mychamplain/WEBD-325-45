@@ -1,14 +1,14 @@
 <?php
 /**
- * @package    Sport Stars
+ * @package    Change Calculator
  *
- * @created    19th April 2022
+ * @created    24th April 2022
  * @author     Llewellyn van der Merwe <https://git.vdm.dev/Llewellyn>
  * @git        WEBD-325-45 <https://git.vdm.dev/Llewellyn/WEBD-325-45>
  * @license    GNU General Public License version 2 or later; see LICENSE.txt
  */
 
-use Sport\Stars\Autoload\ClassLoader;
+use Change\Calculator\Autoload\ClassLoader;
 
 defined('_LEXEC') or die;
 
@@ -30,7 +30,7 @@ if (!class_exists('LLoader'))
 	// If JLoader still does not exist panic.
 	if (!class_exists('LLoader'))
 	{
-		throw new RuntimeException('Sport Stars Platform not loaded.');
+		throw new RuntimeException('Change Calculator Platform not loaded.');
 	}
 }
 
@@ -42,7 +42,7 @@ LLoader::setup();
 $loader = require LPATH_LIBRARIES . '/vendor/autoload.php';
 
 // We need to pull our decorated class loader into memory before unregistering Composer's loader
-class_exists('\\Sport\\Stars\\Autoload\\ClassLoader');
+class_exists('\\Change\\Calculator\\Autoload\\ClassLoader');
 
 $loader->unregister();
 

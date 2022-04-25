@@ -6,40 +6,23 @@
  * @license    http://www.gnu.org/licenses/gpl-2.0.txt GNU General Public License Version 2 or Later
  */
 
-namespace Sport\Stars\Service;
+namespace Change\Calculator\Service;
 
 use Joomla\Application\AbstractApplication;
 use Joomla\DI\Container;
 use Joomla\DI\ServiceProviderInterface;
-use Joomla\Registry\Registry;
-use Sport\Stars\Asset\MixPathPackage;
-use Sport\Stars\Renderer\ApplicationContext;
-use Sport\Stars\Renderer\FrameworkExtension;
-use Sport\Stars\Renderer\FrameworkTwigRuntime;
+use Change\Calculator\Renderer\FrameworkExtension;
+use Change\Calculator\Renderer\FrameworkTwigRuntime;
 use Joomla\Preload\PreloadManager;
 use Joomla\Renderer\RendererInterface;
 use Joomla\Renderer\TwigRenderer;
-use Symfony\Component\Asset\Packages;
-use Symfony\Component\Asset\PathPackage;
-use Symfony\Component\Asset\VersionStrategy\EmptyVersionStrategy;
-use Symfony\Component\Asset\VersionStrategy\JsonManifestVersionStrategy;
-use Twig\Cache\CacheInterface;
-use Twig\Cache\FilesystemCache;
-use Twig\Cache\NullCache;
 use Twig\Environment;
 use Twig\Extension\DebugExtension;
-use Twig\Extension\ProfilerExtension;
+use Twig\Extra\Intl\IntlExtension;
 use Twig\Loader\FilesystemLoader;
 use Twig\Loader\LoaderInterface;
 use Twig\Profiler\Profile;
 use Twig\RuntimeLoader\ContainerRuntimeLoader;
-use Twig_CacheInterface;
-use Twig_ContainerRuntimeLoader;
-use Twig_Environment;
-use Twig_Extension_Debug;
-use Twig_Extension_Profiler;
-use Twig_LoaderInterface;
-use Twig_Profiler_Profile;
 
 /**
  * Templating service provider
@@ -56,82 +39,32 @@ class TemplatingProvider implements ServiceProviderInterface
 	 */
 	public function register(Container $container): void
 	{
-		$container->alias(Packages::class, 'asset.packages')
-			->share('asset.packages', [$this, 'getAssetPackagesService'], true);
-
 		$container->alias(RendererInterface::class, 'renderer')
 			->alias(TwigRenderer::class, 'renderer')
 			->share('renderer', [$this, 'getRendererService'], true);
 
-		$container->alias(CacheInterface::class, 'twig.cache')
-			->alias(Twig_CacheInterface::class, 'twig.cache')
-			->share('twig.cache', [$this, 'getTwigCacheService'], true);
-
 		$container->alias(Environment::class, 'twig.environment')
-			->alias(Twig_Environment::class, 'twig.environment')
 			->share('twig.environment', [$this, 'getTwigEnvironmentService'], true);
 
 		$container->alias(DebugExtension::class, 'twig.extension.debug')
-			->alias(Twig_Extension_Debug::class, 'twig.extension.debug')
 			->share('twig.extension.debug', [$this, 'getTwigExtensionDebugService'], true);
 
 		$container->alias(FrameworkExtension::class, 'twig.extension.framework')
 			->share('twig.extension.framework', [$this, 'getTwigExtensionFrameworkService'], true);
 
-		// This service cannot be protected as it is decorated when the debug bar is available
-		$container->alias(ProfilerExtension::class, 'twig.extension.profiler')
-			->alias(Twig_Extension_Profiler::class, 'twig.extension.profiler')
-			->share('twig.extension.profiler', [$this, 'getTwigExtensionProfilerService']);
-
 		$container->alias(LoaderInterface::class, 'twig.loader')
-			->alias(Twig_LoaderInterface::class, 'twig.loader')
 			->share('twig.loader', [$this, 'getTwigLoaderService'], true);
 
 		$container->alias(Profile::class, 'twig.profiler.profile')
-			->alias(Twig_Profiler_Profile::class, 'twig.profiler.profile')
 			->share('twig.profiler.profile', [$this, 'getTwigProfilerProfileService'], true);
 
 		$container->alias(FrameworkTwigRuntime::class, 'twig.runtime.framework')
 			->share('twig.runtime.framework', [$this, 'getTwigRuntimeFrameworkService'], true);
 
 		$container->alias(ContainerRuntimeLoader::class, 'twig.runtime.loader')
-			->alias(Twig_ContainerRuntimeLoader::class, 'twig.runtime.loader')
 			->share('twig.runtime.loader', [$this, 'getTwigRuntimeLoaderService'], true);
 
 		$this->tagTwigExtensions($container);
-	}
-
-	/**
-	 * Get the `asset.packages` service
-	 *
-	 * @param   Container  $container  The DI container.
-	 *
-	 * @return  Packages
-	 */
-	public function getAssetPackagesService(Container $container): Packages
-	{
-		/** @var AbstractApplication $app */
-		$app = $container->get(AbstractApplication::class);
-
-		$context = new ApplicationContext($app);
-
-		$mediaPath = $app->get('uri.media.path', '/media/');
-
-		$defaultPackage = new PathPackage($mediaPath, new EmptyVersionStrategy, $context);
-
-		$mixStrategy = new MixPathPackage(
-			$defaultPackage,
-			$mediaPath,
-			new JsonManifestVersionStrategy(LPATH_ROOT . '/media/mix-manifest.json'),
-			$context
-		);
-
-		return new Packages(
-			$defaultPackage,
-			[
-				'mix' => $mixStrategy,
-			]
-		);
 	}
 
 	/**
@@ -147,31 +80,6 @@ class TemplatingProvider implements ServiceProviderInterface
 	}
 
 	/**
-	 * Get the `twig.cache` service
-	 *
-	 * @param   Container  $container  The DI container.
-	 *
-	 * @return  Twig_CacheInterface
-	 */
-	public function getTwigCacheService(Container $container): Twig_CacheInterface
-	{
-		/** @var Registry $config */
-		$config = $container->get('config');
-
-		// Pull down the renderer config
-		$cacheEnabled = $config->get('template.cache.enabled', false);
-		$cachePath    = $config->get('template.cache.path', 'cache/twig');
-		$debug        = $config->get('template.debug', false);
-
-		if ($debug === false && $cacheEnabled !== false)
-		{
-			return new FilesystemCache(LPATH_ROOT . '/' . $cachePath);
-		}
-
-		return new NullCache;
-	}
-
-	/**
 	 * Get the `twig.environment` service
 	 *
 	 * @param   Container  $container  The DI container.
@@ -180,10 +88,7 @@ class TemplatingProvider implements ServiceProviderInterface
 	 */
 	public function getTwigEnvironmentService(Container $container): Environment
 	{
-		/** @var Registry $config */
-		$config = $container->get('config');
-
-		$debug = $config->get('template.debug', false);
+		$debug = false;
 
 		$environment = new Environment(
 			$container->get('twig.loader'),
@@ -193,14 +98,14 @@ class TemplatingProvider implements ServiceProviderInterface
 		// Add the runtime loader
 		$environment->addRuntimeLoader($container->get('twig.runtime.loader'));
 
-		// Set up the environment's caching service
-		$environment->setCache($container->get('twig.cache'));
-
 		// Add the Twig extensions
 		$environment->setExtensions($container->getTagged('twig.extension'));
 
+		// add international
+		$environment->addExtension(new IntlExtension());
+
 		// Add a global tracking the debug states
-		$environment->addGlobal('appDebug', $config->get('debug', false));
+		$environment->addGlobal('appDebug', false);
 		$environment->addGlobal('fwDebug', $debug);
 
 		return $environment;
@@ -231,25 +136,13 @@ class TemplatingProvider implements ServiceProviderInterface
 	}
 
 	/**
-	 * Get the `twig.extension.profiler` service
-	 *
-	 * @param   Container  $container  The DI container.
-	 *
-	 * @return  ProfilerExtension
-	 */
-	public function getTwigExtensionProfilerService(Container $container): ProfilerExtension
-	{
-		return new ProfilerExtension($container->get('twig.profiler.profile'));
-	}
-
-	/**
 	 * Get the `twig.loader` service
 	 *
 	 * @param   Container  $container  The DI container.
 	 *
-	 * @return  Twig_LoaderInterface
+	 * @return  FilesystemLoader
 	 */
-	public function getTwigLoaderService(Container $container): Twig_LoaderInterface
+	public function getTwigLoaderService(Container $container): FilesystemLoader
 	{
 		return new FilesystemLoader([LPATH_TEMPLATES]);
 	}
@@ -277,8 +170,7 @@ class TemplatingProvider implements ServiceProviderInterface
 	{
 		return new FrameworkTwigRuntime(
 			$container->get(AbstractApplication::class),
-			$container->get(PreloadManager::class),
-			LPATH_ROOT . '/media/sri-manifest.json'
+			$container->get(PreloadManager::class)
 		);
 	}
 
@@ -303,18 +195,6 @@ class TemplatingProvider implements ServiceProviderInterface
 	 */
 	private function tagTwigExtensions(Container $container): void
 	{
-		/** @var Registry $config */
-		$config = $container->get('config');
-
-		$debug = $config->get('template.debug', false);
-
-		$twigExtensions = ['twig.extension.framework'];
-
-		if ($debug)
-		{
-			$twigExtensions[] = 'twig.extension.debug';
-		}
-
-		$container->tag('twig.extension', $twigExtensions);
+		$container->tag('twig.extension', ['twig.extension.framework']);
 	}
 }

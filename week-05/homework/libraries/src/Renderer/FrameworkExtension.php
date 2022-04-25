@@ -6,7 +6,7 @@
  * @license    http://www.gnu.org/licenses/gpl-2.0.txt GNU General Public License Version 2 or Later
  */
 
-namespace Sport\Stars\Renderer;
+namespace Change\Calculator\Renderer;
 
 use Symfony\Component\Asset\Packages;
 use Twig\Extension\AbstractExtension;
@@ -24,11 +24,11 @@ class FrameworkExtension extends AbstractExtension
 	 *
 	 * @return  TwigFilter[]  An array of TwigFilter instances
 	 */
-	public function getFilters()
+	public function getFilters(): array
 	{
 		return [
 			new TwigFilter('get_class', 'get_class'),
-			new TwigFilter('strip_root_path', [$this, 'stripRootPath']),
+			new TwigFilter('strip_root_path', [$this, 'stripRootPath'])
 		];
 	}
 
@@ -37,14 +37,13 @@ class FrameworkExtension extends AbstractExtension
 	 *
 	 * @return  TwigFunction[]  An array of TwigFunction instances
 	 */
-	public function getFunctions()
+	public function getFunctions(): array
 	{
 		return [
 			new TwigFunction('asset', [Packages::class, 'getUrl']),
 			new TwigFunction('preload', [FrameworkTwigRuntime::class, 'preloadAsset']),
 			new TwigFunction('request_uri', [FrameworkTwigRuntime::class, 'getRequestUri']),
 			new TwigFunction('route', [FrameworkTwigRuntime::class, 'getRouteUri']),
-			new TwigFunction('sri', [FrameworkTwigRuntime::class, 'getSriAttributes'], ['is_safe' => ['html']]),
 			new TwigFunction('message_queue', [FrameworkTwigRuntime::class, 'getMessageQueue']),
 			new TwigFunction('shorten_string', [FrameworkTwigRuntime::class, 'shortenString']),
 		];

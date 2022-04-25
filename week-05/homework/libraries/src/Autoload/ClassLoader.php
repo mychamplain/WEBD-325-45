@@ -6,7 +6,7 @@
  * @license    GNU General Public License version 2 or later; see LICENSE.txt
  */
 
-namespace Sport\Stars\Autoload;
+namespace Change\Calculator\Autoload;
 
 defined('_LEXEC') or die;
 
@@ -15,7 +15,7 @@ use LLoader;
 use function defined;
 
 /**
- * Decorate Composer ClassLoader for Sport Stars!
+ * Decorate Composer ClassLoader for Change Calculator!
  *
  * For backward compatibility due to class aliasing in the CMS, the loadClass() method was modified to call
  * the LLoader::applyAliasFor() method.

@@ -6,7 +6,7 @@
  * @license    http://www.gnu.org/licenses/gpl-2.0.txt GNU General Public License Version 2 or Later
  */
 
-namespace Sport\Stars\Renderer;
+namespace Change\Calculator\Renderer;
 
 use Joomla\Application\AbstractApplication;
 use Joomla\Application\AbstractWebApplication;

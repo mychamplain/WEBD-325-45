@@ -6,9 +6,9 @@
  * @license    GNU General Public License version 2 or later; see LICENSE.txt
  */
 
-namespace Sport\Stars\Filter;
+namespace Change\Calculator\Filter;
 
-use Sport\Stars\String\PunycodeHelper;
+use Change\Calculator\String\PunycodeHelper;
 use Joomla\Filter\InputFilter as BaseInputFilter;
 use function chr;
 use function count;

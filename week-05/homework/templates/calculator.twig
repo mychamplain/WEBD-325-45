@@ -1,0 +1,79 @@
+{% extends "index.twig" %}
+
+{% block title %}Change Calculator{% endblock %}
+
+{% block content %}
+<div class="uk-container uk-margin">
+<h1 class="uk-article-title">Change Calculator</h1>
+{{ block("messages_queue", "message_queue.twig") }}
+    <form class="uk-form-stacked" action="{{ route() }}" method="post">
+        <div class="uk-child-width-1-2 uk-margin" uk-grid>
+            <div>
+                <label class="uk-form-label">Transaction Cost</label>
+                <div class="uk-form-controls">
+                    <input name="cost" class="uk-input uk-width-1-1" type="text" placeholder="Add the cost here..." value="{{ form.cost|default('') }}">
+                </div>
+            </div>
+            <div>
+                <label class="uk-form-label">Payment Received</label>
+                <div class="uk-form-controls">
+                    <input name="payment" class="uk-input uk-width-1-1" type="text" placeholder="Add the exact amount of money that the customer handed over to pay..." value="{{ form.payment|default('') }}">
+                </div>
+            </div>
+        </div>
+        <input type="submit" class="uk-button uk-button-primary uk-width-1-1" value="Calculate"/>
+    </form>
+</div>
+{% if change %}
+<div class="uk-container uk-margin">
+    <h1 class="uk-article-title">Here is your change</h1>
+    <div class="uk-alert-success" uk-alert>
+        <h3>Your last transaction</h3>
+        <dl class="uk-description-list">
+            <dt>Cost:</dt>
+            <dd>{{ change.cost|format_currency('USD') }}</dd>
+            <dt>Payment:</dt>
+            <dd>{{ change.payment|format_currency('USD') }}</dd>
+            {% if change.result.change %}
+            <dt>Change:</dt>
+            <dd>{{ change.result.change|format_currency('USD') }}</dd>
+            {% endif %}
+        </dl>
+        {% if change.result.breakdown %}
+            <p>The cashier should return {{ change.result.change|format_currency('USD') }} to the customer as
+                {% for denomination in change.result.breakdown %}{{ denomination.spacer }}{{ denomination.number_name }} {{ denomination.name }}{% endfor %}
+            </p>
+        {% else %}
+            There has been an error, please try again.
+        {% endif %}
+    </div>
+    {% if change.result.breakdown %}
+    <table class="uk-table uk-table-small uk-table-divider uk-table-responsive">
+        <thead>
+        <tr>
+            <th>Denomination</th>
+            <th class="uk-table-shrink">Number</th>
+            <th class="uk-table-shrink">Total</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for denomination in change.result.breakdown %}
+            <tr>
+                <td>{{ denomination.value|format_currency('USD') }}</td>
+                <td>{{ denomination.number }}</td>
+                <td>{{ denomination.total|format_currency('USD') }}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+        <tfoot>
+        <tr>
+            <td></td>
+            <td >Total:</td>
+            <td>{{ change.result.change|format_currency('USD') }}</td>
+        </tr>
+        </tfoot>
+    </table>
+    {% endif %}
+</div>
+{% endif %}
+{% endblock %}

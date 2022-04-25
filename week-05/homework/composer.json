@@ -1,10 +1,10 @@
 {
-  "name": "sport/stars",
+  "name": "change/calculator",
   "type": "project",
-  "description": "Sport Stars",
+  "description": "Change Calculator",
   "keywords": [
-    "sport",
-    "star"
+    "change",
+    "calculator"
   ],
   "homepage": "https://github.com/mychamplain",
   "license": "GPL-2.0-or-later",
@@ -21,7 +21,7 @@
   },
   "autoload": {
     "psr-4": {
-      "Sport\\Stars\\": "libraries/src/"
+      "Change\\Calculator\\": "libraries/src/"
     }
   },
   "require": {
@@ -29,12 +29,7 @@
     "ext-json": "*",
     "joomla/application": "~2.0",
     "joomla/archive": "~2.0",
-    "joomla/authentication": "~2.0",
-    "joomla/console": "~2.0",
     "joomla/controller": "~2.0",
-    "joomla/crypt": "~2.0",
-    "joomla/data": "~2.0",
-    "joomla/database": "~2.0",
     "joomla/di": "~2.0",
     "joomla/event": "~2.0",
     "joomla/filter": "~2.0",
@@ -44,12 +39,9 @@
     "joomla/model": "~2.0",
     "joomla/preload": "~2.0",
     "joomla/ldap": "~2.0",
-    "joomla/oauth1": "~2.0",
-    "joomla/oauth2": "~2.0",
     "joomla/registry": "~2.0",
     "joomla/renderer": "~2.0",
     "joomla/router": "~2.0",
-    "joomla/session": "~2.0",
     "joomla/string": "~2.0",
     "joomla/uri": "~2.0",
     "joomla/utilities": "~2.0",
@@ -63,10 +55,7 @@
     "defuse/php-encryption": "^2.0",
     "symfony/asset": "^5.1.2",
     "symfony/process": "^5.1.2",
-    "symfony/web-link": "^5.1.2",
-    "symfony/yaml": "^5.1.2",
-    "theiconic/php-ga-measurement-protocol": "^2.7.2",
     "twig/twig": "^2.13",
-    "phpmailer/phpmailer": "~6.0"
+    "twig/intl-extra": "^3.3.5"
   }
 }

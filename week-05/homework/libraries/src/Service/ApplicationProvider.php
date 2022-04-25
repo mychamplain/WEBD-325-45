@@ -1,14 +1,14 @@
 <?php
 /**
- * @package    Sport Stars
+ * @package    Change Calculator
  *
- * @created    19th April 2022
+ * @created    24th April 2022
  * @author     Llewellyn van der Merwe <https://git.vdm.dev/Llewellyn>
  * @git        WEBD-325-45 <https://git.vdm.dev/Llewellyn/WEBD-325-45>
  * @license    GNU General Public License version 2 or later; see LICENSE.txt
  */
 
-namespace Sport\Stars\Service;
+namespace Change\Calculator\Service;
 
 use Joomla\Application\AbstractWebApplication;
 use Joomla\Application\Controller\ControllerResolverInterface;
@@ -17,7 +17,7 @@ use Joomla\DI\Container;
 use Joomla\DI\ServiceProviderInterface;
 use Joomla\Event\DispatcherInterface;
 
-use Sport\Stars\Application\SportStarsApplication;
+use Change\Calculator\Application\ChangeCalculatorApplication;
 
 use Joomla\Input\Input;
 use Joomla\Router\RouterInterface;
@@ -43,8 +43,8 @@ class ApplicationProvider implements ServiceProviderInterface
 		 */
 
 		// This service cannot be protected as it is decorated when the debug bar is available
-		$container->alias(SportStarsApplication::class, AbstractWebApplication::class)
-			->share(AbstractWebApplication::class, [$this, 'getSportStarsApplicationClassService']);
+		$container->alias(ChangeCalculatorApplication::class, AbstractWebApplication::class)
+			->share(AbstractWebApplication::class, [$this, 'getChangeCalculatorApplicationClassService']);
 
 		/*
 		 * Application Helpers and Dependencies
@@ -57,16 +57,14 @@ class ApplicationProvider implements ServiceProviderInterface
 	 *
 	 * @param   Container  $container  The DI container.
 	 *
-	 * @return  SportStarsApplication
+	 * @return  ChangeCalculatorApplication
 	 */
-	public function getSportStarsApplicationClassService(Container $container): SportStarsApplication
+	public function getChangeCalculatorApplicationClassService(Container $container): ChangeCalculatorApplication
 	{
-		/** @var SportStarsApplication $application */
-		$application = new SportStarsApplication(
+		$application = new ChangeCalculatorApplication(
 			$container->get(ControllerResolverInterface::class),
 			$container->get(RouterInterface::class),
 			$container->get(Input::class),
-			$container->get('config'),
 			$container->get(WebClient::class)
 		);
 

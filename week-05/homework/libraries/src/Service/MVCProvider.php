@@ -1,29 +1,25 @@
 <?php
 /**
- * @package    Sport Stars
+ * @package    Change Calculator
  *
- * @created    19th April 2022
+ * @created    24th April 2022
  * @author     Llewellyn van der Merwe <https://git.vdm.dev/Llewellyn>
  * @git        WEBD-325-45 <https://git.vdm.dev/Llewellyn/WEBD-325-45>
  * @license    GNU General Public License version 2 or later; see LICENSE.txt
  */
 
-namespace Sport\Stars\Service;
+namespace Change\Calculator\Service;
 
 use Joomla\Application\Controller\ContainerControllerResolver;
 use Joomla\Application\Controller\ControllerResolverInterface;
-use Joomla\Database\DatabaseInterface;
 use Joomla\DI\Container;
 use Joomla\DI\ServiceProviderInterface;
 
-use Sport\Stars\Controller\TableController;
-use Sport\Stars\Controller\EditController;
-use Sport\Stars\Controller\WrongCmsController;
-use Sport\Stars\Model\TableModel;
-use Sport\Stars\Model\EditModel;
-use Sport\Stars\View\TableHtmlView;
-use Sport\Stars\View\EditHtmlView;
-use Sport\Stars\Application\SportStarsApplication;
+use Change\Calculator\Controller\CalculatorController;
+use Change\Calculator\Controller\WrongCmsController;
+use Change\Calculator\Model\CalculatorModel;
+use Change\Calculator\View\CalculatorHtmlView;
+use Change\Calculator\Application\ChangeCalculatorApplication;
 
 use Joomla\Input\Input;
 
@@ -46,28 +42,19 @@ class MVCProvider implements ServiceProviderInterface
 			->share(ControllerResolverInterface::class, [$this, 'getControllerResolverService']);
 
 		// Controllers
-		$container->alias(TableController::class, 'controller.table')
-			->share('controller.table', [$this, 'getControllerTableService'], true);
-
-		$container->alias(EditController::class, 'controller.edit')
-			->share('controller.edit', [$this, 'getControllerEditService'], true);
+		$container->alias(CalculatorController::class, 'controller.calculator')
+			->share('controller.calculator', [$this, 'getControllerCalculatorService'], true);
 
 		$container->alias(WrongCmsController::class, 'controller.wrong.cms')
 			->share('controller.wrong.cms', [$this, 'getControllerWrongCmsService'], true);
 
 		// Models
-		$container->alias(TableModel::class, 'model.table')
-			->share('model.table', [$this, 'getModelTableService'], true);
-
-		$container->alias(EditModel::class, 'model.edit')
-			->share('model.edit', [$this, 'getModelEditService'], true);
+		$container->alias(CalculatorModel::class, 'model.calculator')
+			->share('model.calculator', [$this, 'getModelCalculatorService'], true);
 
 		// Views
-		$container->alias(TableHtmlView::class, 'view.table.html')
-			->share('view.table.html', [$this, 'getViewTableHtmlService'], true);
-
-		$container->alias(EditHtmlView::class, 'view.edit.html')
-			->share('view.edit.html', [$this, 'getViewEditHtmlService'], true);
+		$container->alias(CalculatorHtmlView::class, 'view.calculator.html')
+			->share('view.calculator.html', [$this, 'getViewCalculatorHtmlService'], true);
 	}
 
 	/**
@@ -93,102 +80,53 @@ class MVCProvider implements ServiceProviderInterface
 	{
 		return new WrongCmsController(
 			$container->get(Input::class),
-			$container->get(SportStarsApplication::class)
+			$container->get(ChangeCalculatorApplication::class)
 		);
 	}
 
 	/**
-	 * Get the `controller.table` service
+	 * Get the `controller.calculator` service
 	 *
 	 * @param   Container  $container  The DI container.
 	 *
-	 * @return  TableController
+	 * @return  CalculatorController
 	 */
-	public function getControllerTableService(Container $container): TableController
+	public function getControllerCalculatorService(Container $container): CalculatorController
 	{
-		return new TableController(
-			$container->get(TableHtmlView::class),
+		return new CalculatorController(
+			$container->get(CalculatorHtmlView::class),
 			$container->get(Input::class),
-			$container->get(SportStarsApplication::class)
+			$container->get(ChangeCalculatorApplication::class)
 		);
 	}
 
 	/**
-	 * Get the `controller.edit` service
+	 * Get the `model.calculator` service
 	 *
 	 * @param   Container  $container  The DI container.
 	 *
-	 * @return  EditController
+	 * @return  CalculatorModel
 	 */
-	public function getControllerEditService(Container $container): EditController
+	public function getModelCalculatorService(Container $container): CalculatorModel
 	{
-		return new EditController(
-			$container->get(EditModel::class),
-			$container->get(EditHtmlView::class),
-			$container->get(Input::class),
-			$container->get(SportStarsApplication::class)
-		);
+		return new CalculatorModel();
 	}
 
 	/**
-	 * Get the `model.table` service
+	 * Get the `view.calculator.html` service
 	 *
 	 * @param   Container  $container  The DI container.
 	 *
-	 * @return  TableModel
+	 * @return  CalculatorHtmlView
 	 */
-	public function getModelTableService(Container $container): TableModel
+	public function getViewCalculatorHtmlService(Container $container): CalculatorHtmlView
 	{
-		return new TableModel($container->get(DatabaseInterface::class));
-	}
-
-	/**
-	 * Get the `model.edit` service
-	 *
-	 * @param   Container  $container  The DI container.
-	 *
-	 * @return  EditModel
-	 */
-	public function getModelEditService(Container $container): EditModel
-	{
-		return new EditModel($container->get(DatabaseInterface::class));
-	}
-
-	/**
-	 * Get the `view.table.html` service
-	 *
-	 * @param   Container  $container  The DI container.
-	 *
-	 * @return  TableHtmlView
-	 */
-	public function getViewTableHtmlService(Container $container): TableHtmlView
-	{
-		$view = new TableHtmlView(
-			$container->get('model.edit'),
-			$container->get('model.table'),
+		$view = new CalculatorHtmlView(
+			$container->get('model.calculator'),
 			$container->get('renderer')
 		);
 
-		$view->setLayout('table.twig');
-
-		return $view;
-	}
-
-	/**
-	 * Get the `view.edit.html` service
-	 *
-	 * @param   Container  $container  The DI container.
-	 *
-	 * @return  EditHtmlView
-	 */
-	public function getViewEditHtmlService(Container $container): EditHtmlView
-	{
-		$view = new EditHtmlView(
-			$container->get('model.edit'),
-			$container->get('renderer')
-		);
-
-		$view->setLayout('edit.twig');
+		$view->setLayout('calculator.twig');
 
 		return $view;
 	}

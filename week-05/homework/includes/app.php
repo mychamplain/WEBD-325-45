@@ -1,14 +1,12 @@
 <?php
 /**
- * @package    Sport Stars
+ * @package    Change Calculator
  *
- * @created    19th April 2022
+ * @created    24th April 2022
  * @author     Llewellyn van der Merwe <https://git.vdm.dev/Llewellyn>
  * @git        WEBD-325-45 <https://git.vdm.dev/Llewellyn/WEBD-325-45>
  * @license    GNU General Public License version 2 or later; see LICENSE.txt
  */
-
-use Sport\Stars\Factory;
 
 defined('_LEXEC') or die;
 
@@ -44,19 +42,17 @@ require_once LPATH_BASE . '/includes/framework.php';
 try
 {
 	$container = (new Joomla\DI\Container)
-		->registerServiceProvider(new Sport\Stars\Service\ConfigurationProvider(LPATH_CONFIGURATION . '/config.php'))
-		->registerServiceProvider(new Sport\Stars\Service\InputProvider)
-		->registerServiceProvider(new Sport\Stars\Service\ApplicationProvider)
-		->registerServiceProvider(new Sport\Stars\Service\RouterProvider)
-		->registerServiceProvider(new Sport\Stars\Service\MVCProvider)
-		->registerServiceProvider(new Joomla\Database\Service\DatabaseProvider)
-		->registerServiceProvider(new Sport\Stars\Service\EventProvider)
-		->registerServiceProvider(new Sport\Stars\Service\HttpProvider)
-		->registerServiceProvider(new Sport\Stars\Service\LoggingProvider)
+		->registerServiceProvider(new Change\Calculator\Service\InputProvider)
+		->registerServiceProvider(new Change\Calculator\Service\ApplicationProvider)
+		->registerServiceProvider(new Change\Calculator\Service\RouterProvider)
+		->registerServiceProvider(new Change\Calculator\Service\MVCProvider)
+		->registerServiceProvider(new Change\Calculator\Service\EventProvider)
+		->registerServiceProvider(new Change\Calculator\Service\HttpProvider)
+		->registerServiceProvider(new Change\Calculator\Service\LoggingProvider)
 		->registerServiceProvider(new Joomla\Preload\Service\PreloadProvider)
-		->registerServiceProvider(new Sport\Stars\Service\TemplatingProvider);
+		->registerServiceProvider(new Change\Calculator\Service\TemplatingProvider);
 
-	// Alias the web application to Sport Stars's base application class as this is the primary application for the environment
+	// Alias the web application to Change Calculator's base application class as this is the primary application for the environment
 	$container->alias(Joomla\Application\AbstractApplication::class, Joomla\Application\AbstractWebApplication::class);
 
 	// Alias the web logger to the PSR-3 interface as this is the primary logger for the environment
@@ -77,11 +73,8 @@ catch (Throwable $e)
 // source: https://github.com/joomla/framework.joomla.org/blob/master/www/index.php#L85
 try
 {
-	$app = $container->get(Joomla\Application\AbstractApplication::class);
-	// Set the application as global app
-	Factory::$application = $app;
 	// Execute the application.
-	$app->execute();
+	$container->get(Joomla\Application\AbstractApplication::class)->execute();
 }
 catch (Throwable $e)
 {

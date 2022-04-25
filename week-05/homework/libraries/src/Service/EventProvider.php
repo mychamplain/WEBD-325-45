@@ -1,18 +1,18 @@
 <?php
 /**
-* Joomla! Framework Website
-*
-* @copyright  Copyright (C) 2014 - 2017 Open Source Matters, Inc. All rights reserved.
-* @license    http://www.gnu.org/licenses/gpl-2.0.txt GNU General Public License Version 2 or Later
-*/
+ * Joomla! Framework Website
+ *
+ * @copyright  Copyright (C) 2014 - 2017 Open Source Matters, Inc. All rights reserved.
+ * @license    http://www.gnu.org/licenses/gpl-2.0.txt GNU General Public License Version 2 or Later
+ */
 
-namespace Sport\Stars\Service;
+namespace Change\Calculator\Service;
 
 use Joomla\DI\Container;
 use Joomla\DI\ServiceProviderInterface;
 use Joomla\Event\Dispatcher;
 use Joomla\Event\DispatcherInterface;
-use Sport\Stars\EventListener\ErrorSubscriber;
+use Change\Calculator\EventListener\ErrorSubscriber;
 use Joomla\Renderer\RendererInterface;
 use Psr\Log\LoggerInterface;
 

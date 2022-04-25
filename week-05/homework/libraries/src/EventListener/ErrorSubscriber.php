@@ -6,14 +6,12 @@
 * @license    http://www.gnu.org/licenses/gpl-2.0.txt GNU General Public License Version 2 or Later
 */
 
-namespace Sport\Stars\EventListener;
+namespace Change\Calculator\EventListener;
 
+use Change\Calculator\Application\ChangeCalculatorApplication;
 use Joomla\Application\ApplicationEvents;
 use Joomla\Application\Event\ApplicationErrorEvent;
-use Joomla\Console\ConsoleEvents;
-use Joomla\Console\Event\ApplicationErrorEvent as ConsoleApplicationErrorEvent;
 use Joomla\Event\SubscriberInterface;
-use Sport\Stars\Application\SiteApplication;
 use Joomla\Renderer\RendererInterface;
 use Joomla\Router\Exception\MethodNotAllowedException;
 use Joomla\Router\Exception\RouteNotFoundException;
@@ -57,21 +55,8 @@ class ErrorSubscriber implements SubscriberInterface, LoggerAwareInterface
 	public static function getSubscribedEvents(): array
 	{
 		return [
-			ApplicationEvents::ERROR         => 'handleWebError',
-			ConsoleEvents::APPLICATION_ERROR => 'handleConsoleError',
+			ApplicationEvents::ERROR         => 'handleWebError'
 		];
-	}
-
-	/**
-	 * Handle console application errors.
-	 *
-	 * @param   ConsoleApplicationErrorEvent  $event  Event object
-	 *
-	 * @return  void
-	 */
-	public function handleConsoleError(ConsoleApplicationErrorEvent $event): void
-	{
-		$this->logError($event->getError());
 	}
 
 	/**
@@ -83,7 +68,7 @@ class ErrorSubscriber implements SubscriberInterface, LoggerAwareInterface
 	 */
 	public function handleWebError(ApplicationErrorEvent $event): void
 	{
-		/** @var SiteApplication $app */
+		/** @var ChangeCalculatorApplication $app */
 		$app = $event->getApplication();
 
 		switch (true)
@@ -145,7 +130,7 @@ class ErrorSubscriber implements SubscriberInterface, LoggerAwareInterface
 	 */
 	private function prepareResponse(ApplicationErrorEvent $event): void
 	{
-		/** @var SiteApplication $app */
+		/** @var ChangeCalculatorApplication $app */
 		$app = $event->getApplication();
 
 		$app->allowCache(false);

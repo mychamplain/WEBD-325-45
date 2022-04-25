@@ -1,6 +1,6 @@
 <?php
 /**
- * @package    Sport Stars
+ * @package    Change Calculator
  *
  * Joomla! Content Management System
  *
@@ -308,15 +308,15 @@ abstract class LLoader
 	}
 
 	/**
-	 * Method to setup the autoloaders for the Sport Stars Platform.
+	 * Method to setup the autoloaders for the Change Calculator Platform.
 	 * Since the SPL autoloaders are called in a queue we will add our explicit
 	 * class-registration based loader first, then fall back on the autoloader based on conventions.
 	 * This will allow people to register a class in a specific location and override platform libraries
 	 * as was previously possible.
 	 *
 	 * @param   boolean  $enablePsr       True to enable autoloading based on PSR-0.
-	 * @param   boolean  $enablePrefixes  True to enable prefix based class loading (needed to auto load the Sport Stars core).
-	 * @param   boolean  $enableClasses   True to enable class map based class loading (needed to auto load the Sport Stars core).
+	 * @param   boolean  $enablePrefixes  True to enable prefix based class loading (needed to auto load the Change Calculator core).
+	 * @param   boolean  $enableClasses   True to enable class map based class loading (needed to auto load the Change Calculator core).
 	 *
 	 * @return  void
 	 *
