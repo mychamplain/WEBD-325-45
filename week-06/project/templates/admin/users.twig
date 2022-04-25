@@ -1,0 +1,59 @@
+{% extends "index.twig" %}
+
+{% block title %}Users{% endblock %}
+
+{% block content %}
+<div class="uk-container uk-margin">
+    <h1 class="uk-article-title">Users</h1>
+    {{ block("messages_queue", "message_queue.twig") }}
+    <a class="uk-button uk-button-default" href="{{ route() }}index.php/user?task=create">Create</a>
+    {% if list %}
+        <table class="uk-table uk-table-justify uk-table-divider">
+            <thead>
+            <tr>
+                <th class="uk-width-small">Action</th>
+                <th>Name</th>
+                <th class="uk-width-small">Email</th>
+                <th class="uk-width-small">State</th>
+                <th>ID</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for item in list %}
+                <tr>
+                    <td>
+                        <div class="uk-button-group uk-width-1-1">
+                            <a class="uk-button uk-button-default uk-button-small" href="{{ route() }}index.php/user?id={{ item.id }}&task=edit">Edit</a>
+                            <button class="uk-button uk-button-default uk-button-small" onclick="confirmDeletion('{{ item.name }}', {{ item.id }});">Delete</button>
+                        </div>
+                    </td>
+                    <td>{{ item.name }}</td>
+                    <td>{{ item.email }}</td>
+                    <td>
+                        {% if item.block == 0 %}
+                            <button class="uk-button uk-button-primary uk-button-small uk-width-1-1">Active</button>
+                        {% else %}
+                            <button class="uk-button uk-button-danger uk-button-small uk-width-1-1">Blocked</button>
+                        {% endif %}
+                    </td>
+                    <td>{{ item.id }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <div class="uk-alert-primary" uk-alert>
+            <p>There has no items been found, click create to add some.</p>
+        </div>
+    {% endif %}
+</div>
+<script>
+    function confirmDeletion(name, id){
+        UIkit.modal.confirm('You are about to permanently delete <b>' + name + '</b>?').then(function () {
+            window.open("{{ route() }}index.php/user?id=" + id + "&task=delete", "_self")
+        }, function () {
+            // we do nothing ;)
+        });
+    }
+</script>
+{% endblock %}

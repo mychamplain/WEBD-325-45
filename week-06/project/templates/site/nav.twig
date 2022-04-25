@@ -1,0 +1,40 @@
+{% block bodyNavigation %}
+{% set center = false %}
+{% set right = false %}
+{% if main_menu %}
+    {% for menu in main_menu %}
+        {% if menu.root and menu.position == 'center' %}
+            {% set center = true %}
+        {% elseif menu.root and menu.position == 'right' %}
+            {% set right = true %}
+        {% endif %}
+    {% endfor %}
+{% endif %}
+<nav class="uk-navbar-container" uk-navbar>
+    <div class="uk-navbar-center">
+        <ul class="uk-navbar-nav">
+            <li class="uk-active"><a href="{{ route() }}">Home</a></li>
+            {% if center %}
+                {% for menu in main_menu %}
+                    {% if menu.root and menu.position == 'center' %}
+                        <li><a href="{{ route() }}{{ menu.path }}">{{ menu.title }}</a></li>
+                    {% endif %}
+                {% endfor %}
+            {% endif %}
+        </ul>
+    </div>
+    {% if right %}
+    <div class="uk-navbar-right">
+        <ul class="uk-navbar-nav">
+            {% if right %}
+                {% for menu in main_menu %}
+                    {% if menu.root and menu.position == 'right' %}
+                        <li><a href="{{ route() }}{{ menu.path }}">{{ menu.title }}</a></li>
+                    {% endif %}
+                {% endfor %}
+            {% endif %}
+        </ul>
+    </div>
+    {% endif %}
+</nav>
+{% endblock %}
