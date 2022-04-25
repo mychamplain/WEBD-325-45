@@ -8,7 +8,7 @@
  * @license    GNU General Public License version 2 or later; see LICENSE.txt
  */
 
-namespace Octoleo\CMS\Model;
+namespace Octoleo\CMS\Model\Util;
 
 /**
  * Trait for getting menu items
@@ -20,18 +20,17 @@ trait SiteMenuTrait
 	/**
 	 * Get all menu items that are root and published and not home page
 	 *
-	 * @param   string|null  $active
+	 * @param   int $active
 	 *
 	 * @return array
 	 */
-	public function getMenus($active = null): array
+	public function getMenus(int $active = 0): array
 	{
 		$db = $this->getDb();
 
 		$query = $db->getQuery(true)
 			->select('a.*')
 			->from($db->quoteName('#__menu', 'a'))
-			->where($db->quoteName('a.parent_id') . ' = 0')
 			->where($db->quoteName('a.published') . ' = 1')
 			->where($db->quoteName('a.home') . ' = 0');
 
@@ -51,9 +50,10 @@ trait SiteMenuTrait
 			{
 				$row = [];
 				// set the details
+				$row['id'] = $menu->id;
 				$row['title'] = $menu->title;
 				$row['path'] = $menu->path;
-				$row['root'] = true;
+				$row['parent'] = $menu->parent_id;
 				// set position
 				$params = (isset($menu->params) && strpos($menu->params, 'position') !== false) ? json_decode($menu->params) : null;
 				// default is center

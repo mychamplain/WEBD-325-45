@@ -15,12 +15,12 @@ use Joomla\Renderer\RendererInterface;
 use Joomla\View\HtmlView;
 
 /**
- * Dashboard HTML view class for the application
+ * HTML view class for the application
  */
 class DashboardHtmlView extends HtmlView
 {
 	/**
-	 * The id of item/user/menu
+	 * The id
 	 *
 	 * @var int
 	 */
@@ -36,7 +36,7 @@ class DashboardHtmlView extends HtmlView
 	/**
 	 * Instantiate the view.
 	 *
-	 * @param   DashboardModel     $model       The page model object.
+	 * @param   DashboardModel     $model       The model object.
 	 * @param   RendererInterface  $renderer    The renderer object.
 	 */
 	public function __construct(DashboardModel $model, RendererInterface $renderer)
@@ -58,7 +58,7 @@ class DashboardHtmlView extends HtmlView
 	}
 
 	/**
-	 * Set the active dashboard
+	 * Set the active view
 	 *
 	 * @param   string  $name  The active page name
 	 *
@@ -70,9 +70,9 @@ class DashboardHtmlView extends HtmlView
 	}
 
 	/**
-	 * Set the active page details
+	 * Set the active id
 	 *
-	 * @param   int  $id  The selected item/user/menu
+	 * @param   int  $id  The active id
 	 *
 	 * @return  void
 	 */

@@ -15,19 +15,19 @@ use Joomla\Renderer\RendererInterface;
 use Joomla\View\HtmlView;
 
 /**
- * Dashboard HTML view class for the application
+ * HTML view class for the application
  */
 class UserHtmlView extends HtmlView
 {
 	/**
-	 * The id of user
+	 * The id
 	 *
 	 * @var int
 	 */
 	private $id;
 
 	/**
-	 * The User model object.
+	 * The model object.
 	 *
 	 * @var  UserModel
 	 */
@@ -36,7 +36,7 @@ class UserHtmlView extends HtmlView
 	/**
 	 * Instantiate the view.
 	 *
-	 * @param   UserModel          $model  The page model object.
+	 * @param   UserModel          $model      The model object.
 	 * @param   RendererInterface  $renderer   The renderer object.
 	 */
 	public function __construct(UserModel $model, RendererInterface $renderer)
@@ -50,10 +50,14 @@ class UserHtmlView extends HtmlView
 	 * Method to render the view
 	 *
 	 * @return  string  The rendered view
+	 * @throws \Exception
 	 */
 	public function render(): string
 	{
-		$this->setData(['form' => $this->model->getItem($this->id)]);
+		$this->setData([
+			'form' => $this->model->getItem($this->id),
+			'groups' => $this->model->getUsergroups()
+		]);
 		return parent::render();
 	}
 
@@ -70,9 +74,9 @@ class UserHtmlView extends HtmlView
 	}
 
 	/**
-	 * Set the active page details
+	 * Set the active id
 	 *
-	 * @param   int  $id  The selected user
+	 * @param   int  $id  The active id
 	 *
 	 * @return  void
 	 */

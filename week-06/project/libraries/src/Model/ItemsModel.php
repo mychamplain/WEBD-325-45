@@ -11,12 +11,11 @@
 namespace Octoleo\CMS\Model;
 
 use Joomla\Database\DatabaseDriver;
-use Joomla\Database\ParameterType;
 use Joomla\Model\DatabaseModelInterface;
 use Joomla\Model\DatabaseModelTrait;
 
 /**
- * Model class for items
+ * Model class
  */
 class ItemsModel implements DatabaseModelInterface
 {

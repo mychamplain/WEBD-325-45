@@ -24,6 +24,8 @@ use Octoleo\CMS\Controller\MenuController;
 use Octoleo\CMS\Controller\MenusController;
 use Octoleo\CMS\Controller\UserController;
 use Octoleo\CMS\Controller\UsersController;
+use Octoleo\CMS\Controller\UserGroupController;
+use Octoleo\CMS\Controller\UsergroupsController;
 use Octoleo\CMS\Controller\WrongCmsController;
 use Octoleo\CMS\Model\DashboardModel;
 use Octoleo\CMS\Model\ItemsModel;
@@ -32,6 +34,9 @@ use Octoleo\CMS\Model\MenusModel;
 use Octoleo\CMS\Model\MenuModel;
 use Octoleo\CMS\Model\UserModel;
 use Octoleo\CMS\Model\UsersModel;
+use Octoleo\CMS\Model\UsergroupModel;
+use Octoleo\CMS\Model\UsergroupsModel;
+use Octoleo\CMS\User\UserFactoryInterface;
 use Octoleo\CMS\View\Admin\DashboardHtmlView;
 use Octoleo\CMS\View\Admin\ItemsHtmlView;
 use Octoleo\CMS\View\Admin\ItemHtmlView;
@@ -39,6 +44,8 @@ use Octoleo\CMS\View\Admin\MenuHtmlView;
 use Octoleo\CMS\View\Admin\MenusHtmlView;
 use Octoleo\CMS\View\Admin\UserHtmlView;
 use Octoleo\CMS\View\Admin\UsersHtmlView;
+use Octoleo\CMS\View\Admin\UsergroupHtmlView;
+use Octoleo\CMS\View\Admin\UsergroupsHtmlView;
 use Octoleo\CMS\Application\AdminApplication;
 
 use Joomla\Input\Input;
@@ -72,6 +79,12 @@ class AdminMVCProvider implements ServiceProviderInterface
 		$container->alias(UserController::class, 'controller.user')
 			->share('controller.user', [$this, 'getControllerUserService'], true);
 
+		$container->alias(UsergroupsController::class, 'controller.usergroups')
+			->share('controller.usergroups', [$this, 'getControllerUsergroupsService'], true);
+
+		$container->alias(UsergroupController::class, 'controller.usergroup')
+			->share('controller.usergroup', [$this, 'getControllerUsergroupService'], true);
+
 		$container->alias(MenusController::class, 'controller.menus')
 			->share('controller.menus', [$this, 'getControllerMenusService'], true);
 
@@ -100,6 +113,12 @@ class AdminMVCProvider implements ServiceProviderInterface
 		$container->alias(UserModel::class, 'model.user')
 			->share('model.user', [$this, 'getModelUserService'], true);
 
+		$container->alias(UsergroupsModel::class, 'model.usergroups')
+			->share('model.usergroups', [$this, 'getModelUsergroupsService'], true);
+
+		$container->alias(UsergroupModel::class, 'model.usergroup')
+			->share('model.usergroup', [$this, 'getModelUsergroupService'], true);
+
 		$container->alias(MenusModel::class, 'model.menus')
 			->share('model.menus', [$this, 'getModelMenusService'], true);
 
@@ -121,6 +140,12 @@ class AdminMVCProvider implements ServiceProviderInterface
 
 		$container->alias(UserHtmlView::class, 'view.user.html')
 			->share('view.user.html', [$this, 'getViewUserHtmlService'], true);
+
+		$container->alias(UsergroupsHtmlView::class, 'view.usergroups.html')
+			->share('view.usergroups.html', [$this, 'getViewUsergroupsHtmlService'], true);
+
+		$container->alias(UsergroupHtmlView::class, 'view.usergroup.html')
+			->share('view.usergroup.html', [$this, 'getViewUsergroupHtmlService'], true);
 
 		$container->alias(MenusHtmlView::class, 'view.menus.html')
 			->share('view.menus.html', [$this, 'getViewMenusHtmlService'], true);
@@ -234,7 +259,8 @@ class AdminMVCProvider implements ServiceProviderInterface
 		return new UsersController(
 			$container->get(UsersHtmlView::class),
 			$container->get(Input::class),
-			$container->get(AdminApplication::class)
+			$container->get(AdminApplication::class),
+			$container->get(UserFactoryInterface::class)->getUser()
 		);
 	}
 
@@ -278,7 +304,8 @@ class AdminMVCProvider implements ServiceProviderInterface
 			$container->get(UserModel::class),
 			$container->get(UserHtmlView::class),
 			$container->get(Input::class),
-			$container->get(AdminApplication::class)
+			$container->get(AdminApplication::class),
+			$container->get(UserFactoryInterface::class)->getUser()
 		);
 	}
 
@@ -310,6 +337,95 @@ class AdminMVCProvider implements ServiceProviderInterface
 	}
 
 	/**
+	 * Get the `controller.usergroups` service
+	 *
+	 * @param   Container  $container  The DI container.
+	 *
+	 * @return  UsergroupsController
+	 */
+	public function getControllerUsergroupsService(Container $container): UsergroupsController
+	{
+		return new UsergroupsController(
+			$container->get(UsergroupsHtmlView::class),
+			$container->get(Input::class),
+			$container->get(AdminApplication::class),
+			$container->get(UserFactoryInterface::class)->getUser()
+		);
+	}
+
+	/**
+	 * Get the `model.usergroups` service
+	 *
+	 * @param   Container  $container  The DI container.
+	 *
+	 * @return  UsergroupsModel
+	 */
+	public function getModelUsergroupsService(Container $container): UsergroupsModel
+	{
+		return new UsergroupsModel($container->get(DatabaseInterface::class));
+	}
+
+	/**
+	 * Get the `view.usergroups.html` service
+	 *
+	 * @param   Container  $container  The DI container.
+	 *
+	 * @return  UsergroupsHtmlView
+	 */
+	public function getViewUsergroupsHtmlService(Container $container): UsergroupsHtmlView
+	{
+		return new UsergroupsHtmlView(
+			$container->get('model.usergroups'),
+			$container->get('renderer')
+		);
+	}
+
+	/**
+	 * Get the `controller.usergroup` service
+	 *
+	 * @param   Container  $container  The DI container.
+	 *
+	 * @return  UsergroupController
+	 */
+	public function getControllerUsergroupService(Container $container): UsergroupController
+	{
+		return new UsergroupController(
+			$container->get(UsergroupModel::class),
+			$container->get(UsergroupHtmlView::class),
+			$container->get(Input::class),
+			$container->get(AdminApplication::class),
+			$container->get(UserFactoryInterface::class)->getUser()
+		);
+	}
+
+	/**
+	 * Get the `model.usergroup` service
+	 *
+	 * @param   Container  $container  The DI container.
+	 *
+	 * @return  UsergroupModel
+	 */
+	public function getModelUsergroupService(Container $container): UsergroupModel
+	{
+		return new UsergroupModel($container->get(DatabaseInterface::class));
+	}
+
+	/**
+	 * Get the `view.usergroup.html` service
+	 *
+	 * @param   Container  $container  The DI container.
+	 *
+	 * @return  UsergroupHtmlView
+	 */
+	public function getViewUsergroupHtmlService(Container $container): UsergroupHtmlView
+	{
+		return new UsergroupHtmlView(
+			$container->get('model.usergroup'),
+			$container->get('renderer')
+		);
+	}
+
+	/**
 	 * Get the `controller.menus` service
 	 *
 	 * @param   Container  $container  The DI container.
@@ -321,7 +437,8 @@ class AdminMVCProvider implements ServiceProviderInterface
 		return new MenusController(
 			$container->get(MenusHtmlView::class),
 			$container->get(Input::class),
-			$container->get(AdminApplication::class)
+			$container->get(AdminApplication::class),
+			$container->get(UserFactoryInterface::class)->getUser()
 		);
 	}
 
@@ -365,7 +482,8 @@ class AdminMVCProvider implements ServiceProviderInterface
 			$container->get(MenuModel::class),
 			$container->get(MenuHtmlView::class),
 			$container->get(Input::class),
-			$container->get(AdminApplication::class)
+			$container->get(AdminApplication::class),
+			$container->get(UserFactoryInterface::class)->getUser()
 		);
 	}
 
@@ -408,7 +526,8 @@ class AdminMVCProvider implements ServiceProviderInterface
 		return new ItemsController(
 			$container->get(ItemsHtmlView::class),
 			$container->get(Input::class),
-			$container->get(AdminApplication::class)
+			$container->get(AdminApplication::class),
+			$container->get(UserFactoryInterface::class)->getUser()
 		);
 	}
 
@@ -452,7 +571,8 @@ class AdminMVCProvider implements ServiceProviderInterface
 			$container->get(ItemModel::class),
 			$container->get(ItemHtmlView::class),
 			$container->get(Input::class),
-			$container->get(AdminApplication::class)
+			$container->get(AdminApplication::class),
+			$container->get(UserFactoryInterface::class)->getUser()
 		);
 	}
 

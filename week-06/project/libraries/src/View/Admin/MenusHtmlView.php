@@ -15,12 +15,12 @@ use Joomla\Renderer\RendererInterface;
 use Joomla\View\HtmlView;
 
 /**
- * Dashboard HTML view class for the application
+ * HTML view class for the application
  */
 class MenusHtmlView extends HtmlView
 {
 	/**
-	 * The item model object.
+	 * The model object.
 	 *
 	 * @var  MenusModel
 	 */
@@ -29,7 +29,7 @@ class MenusHtmlView extends HtmlView
 	/**
 	 * Instantiate the view.
 	 *
-	 * @param   MenusModel         $model       The page model object.
+	 * @param   MenusModel         $model       The model object.
 	 * @param   RendererInterface  $renderer    The renderer object.
 	 */
 	public function __construct(MenusModel $model, RendererInterface $renderer)
@@ -51,9 +51,9 @@ class MenusHtmlView extends HtmlView
 	}
 
 	/**
-	 * Set the active view
+	 * Set the active id
 	 *
-	 * @param   string  $name  The active view name
+	 * @param   string  $name  The active id
 	 *
 	 * @return  void
 	 */

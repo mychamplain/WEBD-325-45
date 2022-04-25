@@ -11,6 +11,9 @@ namespace Octoleo\CMS\Renderer;
 use Joomla\Application\AbstractApplication;
 use Joomla\Preload\PreloadManager;
 use Joomla\Session\SessionInterface;
+use Octoleo\CMS\Factory;
+use Octoleo\CMS\User\User;
+use Octoleo\CMS\User\UserFactoryInterface;
 
 /**
  * Twig runtime class
@@ -47,9 +50,14 @@ class FrameworkTwigRuntime
 	private $sriManifestPath;
 
 	/**
-	 * @var SessionInterface
+	 * @var SessionInterface|null
 	 */
 	private $session;
+
+	/**
+	 * @var User|null
+	 */
+	private $user;
 
 	/**
 	 * Constructor
@@ -59,12 +67,16 @@ class FrameworkTwigRuntime
 	 * @param   string                 $sriManifestPath  The path to the SRI manifest data
 	 * @param   SessionInterface|null  $session          The session object
 	 */
-	public function __construct(AbstractApplication $app, PreloadManager $preloadManager, string $sriManifestPath, $session = null)
+	public function __construct(
+		AbstractApplication $app,
+		PreloadManager $preloadManager,
+		string $sriManifestPath,
+		SessionInterface $session = null)
 	{
-		$this->session         = $session;
 		$this->app             = $app;
 		$this->preloadManager  = $preloadManager;
 		$this->sriManifestPath = $sriManifestPath;
+		$this->session         = $session;
 	}
 
 	/**
@@ -147,6 +159,41 @@ class FrameworkTwigRuntime
 			return trim($newString) . '...';
 		}
 		return $string;
+	}
+
+	/**
+	 * Get current user as array
+	 *
+	 * @return  array
+	 */
+	public function getUserArray(): array
+	{
+		if (!$this->user instanceof User)
+		{
+			/** @var \Octoleo\CMS\User\User $user */
+			$this->user = Factory::getContainer()->get(UserFactoryInterface::class)->getUser();
+		}
+		// check again
+		if ($this->user instanceof User && method_exists($this->user, 'toArray'))
+		{
+			return $this->user->toArray();
+		}
+		return [];
+	}
+
+	public function getUser(string $key = 'name', $default = '')
+	{
+		if (!$this->user instanceof User)
+		{
+			/** @var \Octoleo\CMS\User\User $user */
+			$this->user = Factory::getContainer()->get(UserFactoryInterface::class)->getUser();
+		}
+		// check again
+		if ($this->user instanceof User)
+		{
+			return $this->user->get($key, $default);
+		}
+		return '';
 	}
 
 	/**

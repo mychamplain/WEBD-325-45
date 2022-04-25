@@ -11,31 +11,16 @@
 namespace Octoleo\CMS\Model;
 
 use Joomla\Database\DatabaseDriver;
-use Joomla\Database\ParameterType;
 use Joomla\Model\DatabaseModelInterface;
 use Joomla\Model\DatabaseModelTrait;
 
 /**
- * Model class for pages
+ * Model class
  * source: https://github.com/joomla/framework.joomla.org/blob/master/src/Model/PackageModel.php
  */
 class DashboardModel implements DatabaseModelInterface
 {
 	use DatabaseModelTrait;
-
-	/**
-	 * Array of legal dashboards
-	 *
-	 * @var array
-	 */
-	private $legalDashboards = [
-		'items' => 'items.twig',
-		'item' => 'edit.twig',
-		'menus' => 'menus.twig',
-		'menu' => 'edit.twig',
-		'users' => 'users.twig',
-		'user' => 'edit.twig'
-	];
 
 	/**
 	 * Instantiate the model.
@@ -48,7 +33,7 @@ class DashboardModel implements DatabaseModelInterface
 	}
 
 	/**
-	 * Get a active dashboard template name
+	 * Get an active dashboard template name
 	 *
 	 * @param   string  $dashboardName  The dashboard to lookup
 	 *
@@ -57,11 +42,6 @@ class DashboardModel implements DatabaseModelInterface
 	 */
 	public function getDashboard(string $dashboardName): string
 	{
-		if (!isset($this->legalDashboards[$dashboardName]))
-		{
-			return 'dashboard.twig';
-		}
-
-		return $this->legalDashboards[$dashboardName];
+		return 'dashboard.twig'; // only one at this time
 	}
 }

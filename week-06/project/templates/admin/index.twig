@@ -1,5 +1,5 @@
 {% extends "header.twig" %}
-
+{% set user = user_array() %}
 {% block body %}
 <body id="go">
 {% block bodyNavigation %}{{ block("bodyNavigation", "nav.twig") }}{% endblock %}

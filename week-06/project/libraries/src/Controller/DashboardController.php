@@ -14,11 +14,15 @@ use Joomla\Application\AbstractApplication;
 use Joomla\Controller\AbstractController;
 use Joomla\Input\Input;
 use Joomla\Uri\Uri;
+use Octoleo\CMS\Controller\Util\AccessInterface;
+use Octoleo\CMS\Controller\Util\AccessTrait;
+use Octoleo\CMS\Controller\Util\CheckTokenInterface;
+use Octoleo\CMS\Controller\Util\CheckTokenTrait;
 use Octoleo\CMS\View\Admin\DashboardHtmlView;
 use Laminas\Diactoros\Response\HtmlResponse;
 
 /**
- * Controller handling the site's dashboard
+ * Controller handling the requests
  *
  * @method         \Octoleo\CMS\Application\AdminApplication  getApplication()  Get the application object.
  * @property-read  \Octoleo\CMS\Application\AdminApplication  $app              Application object
@@ -37,10 +41,9 @@ class DashboardController extends AbstractController implements AccessInterface,
 	/**
 	 * Constructor.
 	 *
-	 * @param   DashboardHtmlView    $view   The view object.
-	 * @param   Input                $user   The user object.
-	 * @param   Input                $input  The input object.
-	 * @param   AbstractApplication  $app    The application object.
+	 * @param   DashboardHtmlView         $view   The view object.
+	 * @param   Input|null                $input  The input object.
+	 * @param   AbstractApplication|null  $app    The application object.
 	 */
 	public function __construct(DashboardHtmlView $view, Input $input = null, AbstractApplication $app = null)
 	{

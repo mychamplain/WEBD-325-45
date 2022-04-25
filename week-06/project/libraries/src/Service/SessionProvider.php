@@ -36,7 +36,6 @@ class SessionProvider implements ServiceProviderInterface
 	 */
 	public function register(Container $container): void
 	{
-
 		$container->alias(SessionDatabaseHandler::class, HandlerInterface::class)
 			->share(HandlerInterface::class, [$this, 'getSessionDatabaseHandlerClassService'], true);
 

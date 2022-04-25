@@ -8,16 +8,17 @@
  * @license    GNU General Public License version 2 or later; see LICENSE.txt
  */
 
-namespace Octoleo\CMS\View\Page;
+namespace Octoleo\CMS\View\Site;
 
-use Octoleo\CMS\Model\MenuInterface;
-use Octoleo\CMS\Model\PageInterface;
 use Octoleo\CMS\Model\PageModel;
 use Joomla\Renderer\RendererInterface;
 use Joomla\View\HtmlView;
+use Octoleo\CMS\Model\Util\MenuInterface;
+use Octoleo\CMS\Model\Util\PageInterface;
+use Octoleo\CMS\Model\Util\HomeMenuInterface;
 
 /**
- * Page HTML view class for the application
+ * HTML view class for the application
  */
 class PageHtmlView extends HtmlView
 {
@@ -29,14 +30,7 @@ class PageHtmlView extends HtmlView
 	private $page = '';
 
 	/**
-	 * The active page details
-	 *
-	 * @var string
-	 */
-	private $details;
-
-	/**
-	 * The page model object.
+	 * The model object.
 	 *
 	 * @var  PageModel
 	 */
@@ -45,7 +39,7 @@ class PageHtmlView extends HtmlView
 	/**
 	 * Instantiate the view.
 	 *
-	 * @param   PageModel          $model     The page model object.
+	 * @param   PageModel          $model     The model object.
 	 * @param   RendererInterface  $renderer  The renderer object.
 	 */
 	public function __construct(PageModel $model, RendererInterface $renderer)
@@ -66,13 +60,39 @@ class PageHtmlView extends HtmlView
 		$title = 'Error';
 		$body = '';
 		$menus = [];
+		// menu ID
+		$menu_id = 0;
+		$menu_home = false;
+		// set home menu title (not ideal)
+		$home_menu_title = 'Home';
+		// we check if we have a home page
+		if ($this->model instanceof HomeMenuInterface)
+		{
+			$home_page = $this->model->getHomePage();
+			if (isset($home_page->title))
+			{
+				$home_menu_title = $home_page->title;
+			}
+		}
 		// get the page data
 		if ($this->model instanceof PageInterface)
 		{
 			// get the page data
-			$data = $this->model->getPageItemByPath($this->page);
+			if (empty($this->page) && isset($home_page->item_id) && $home_page->item_id > 0)
+			{
+				// this is the home menu
+				$data = $this->model->getPageItemById($home_page->item_id);
+				$menu_home = true;
+			}
+			else
+			{
+				$data = $this->model->getPageItemByPath($this->page);
+			}
+			// check if we found any data
 			if (isset($data->id))
 			{
+				// set the menu ID
+				$menu_id = $data->menu_id;
 				// set the title
 				$title = $data->title;
 				// check if we have intro text we add it to full text
@@ -93,13 +113,16 @@ class PageHtmlView extends HtmlView
 		// set the menus if possible
 		if ($this->model instanceof MenuInterface)
 		{
-			$menus = $this->model->getMenus();
+			$menus = $this->model->getMenus($menu_id);
 		}
 
 		$this->setData(
 			[
-				'main_menu' => $menus,
+				'menus' => $menus,
+				'home' => $menu_home,
+				'menu_active' => $menu_id,
 				'title' => $title,
+				'home_menu_title' => $home_menu_title,
 				'body' => $body
 			]
 		);

@@ -15,19 +15,19 @@ use Joomla\Renderer\RendererInterface;
 use Joomla\View\HtmlView;
 
 /**
- * Dashboard HTML view class for the application
+ * HTML view class for the application
  */
 class ItemHtmlView extends HtmlView
 {
 	/**
-	 * The id of item/user/menu
+	 * The id
 	 *
 	 * @var int
 	 */
 	private $id;
 
 	/**
-	 * The item model object.
+	 * The model object.
 	 *
 	 * @var  ItemModel
 	 */
@@ -36,7 +36,7 @@ class ItemHtmlView extends HtmlView
 	/**
 	 * Instantiate the view.
 	 *
-	 * @param   ItemModel          $model      The page model object.
+	 * @param   ItemModel          $model      The model object.
 	 * @param   RendererInterface  $renderer   The renderer object.
 	 */
 	public function __construct(ItemModel $model, RendererInterface $renderer)
@@ -71,9 +71,9 @@ class ItemHtmlView extends HtmlView
 	}
 
 	/**
-	 * Set the active page details
+	 * Set the active id
 	 *
-	 * @param   int  $id  The selected item
+	 * @param   int  $id  The active id
 	 *
 	 * @return  void
 	 */

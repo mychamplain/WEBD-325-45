@@ -19,24 +19,21 @@ use Joomla\DI\Container;
 use Joomla\DI\ServiceProviderInterface;
 use Joomla\Event\DispatcherInterface;
 
-use Octoleo\CMS\Controller\HomepageController;
 use Octoleo\CMS\Controller\WrongCmsController;
 use Octoleo\CMS\Controller\PageController;
-use Octoleo\CMS\Model\HomepageModel;
 use Octoleo\CMS\Model\PageModel;
-use Octoleo\CMS\View\Page\HomepageHtmlView;
-use Octoleo\CMS\View\Page\PageHtmlView;
+use Octoleo\CMS\Utilities\StringHelper;
+use Octoleo\CMS\View\Site\PageHtmlView;
 use Octoleo\CMS\Application\SiteApplication;
 
 use Joomla\Input\Input;
-use Joomla\Renderer\RendererInterface;
 use Joomla\Router\Route;
 use Joomla\Router\Router;
 use Joomla\Router\RouterInterface;
 use Psr\Log\LoggerInterface;
 
 /**
- * Application service provider
+ * Site Application service provider
  * source: https://github.com/joomla/framework.joomla.org/blob/master/src/Service/ApplicationProvider.php
  */
 class SiteApplicationProvider implements ServiceProviderInterface
@@ -78,9 +75,6 @@ class SiteApplicationProvider implements ServiceProviderInterface
 		 */
 
 		// Controllers
-		$container->alias(HomepageController::class, 'controller.homepage')
-			->share('controller.homepage', [$this, 'getControllerHomepageService'], true);
-
 		$container->alias(PageController::class, 'controller.page')
 			->share('controller.page', [$this, 'getControllerPageService'], true);
 
@@ -88,16 +82,10 @@ class SiteApplicationProvider implements ServiceProviderInterface
 			->share('controller.wrong.cms', [$this, 'getControllerWrongCmsService'], true);
 
 		// Models
-		$container->alias(HomepageModel::class, 'model.homepage')
-			->share('model.homepage', [$this, 'getModelHomepageService'], true);
-
 		$container->alias(PageModel::class, 'model.page')
 			->share('model.page', [$this, 'getModelPageService'], true);
 
 		// Views
-		$container->alias(HomepageHtmlView::class, 'view.homepage.html')
-			->share('view.homepage.html', [$this, 'getViewHomepageHtmlService'], true);
-
 		$container->alias(PageHtmlView::class, 'view.page.html')
 			->share('view.page.html', [$this, 'getViewPageHtmlService'], true);
 	}
@@ -134,30 +122,27 @@ class SiteApplicationProvider implements ServiceProviderInterface
 		/*
 		 * Web routes
 		 */
-		$router->addRoute(new Route(['GET', 'HEAD'], '/', HomepageController::class));
+		$router->addRoute(new Route(['GET', 'HEAD'], '/', PageController::class));
 
+		// dynamic pages
+		$pages = '/:root';
 		$router->get(
-			'/:view',
+			$pages,
 			PageController::class
 		);
+		// set a mad depth TODO: we should limit the menu depth to 6 or something
+		$depth = range(1,20);
+		foreach ($depth as $page)
+		{
+			$page = StringHelper::numbers($page);
+			$pages .= "/:$page";
+			$router->get(
+				$pages,
+				PageController::class
+			);
+		}
 
 		return $router;
-	}
-
-	/**
-	 * Get the `controller.homepage` service
-	 *
-	 * @param   Container  $container  The DI container.
-	 *
-	 * @return  HomepageController
-	 */
-	public function getControllerHomepageService(Container $container): HomepageController
-	{
-		return new HomepageController(
-			$container->get(HomepageHtmlView::class),
-			$container->get(Input::class),
-			$container->get(SiteApplication::class)
-		);
 	}
 
 	/**
@@ -189,18 +174,6 @@ class SiteApplicationProvider implements ServiceProviderInterface
 			$container->get(Input::class),
 			$container->get(SiteApplication::class)
 		);
-	}
-
-	/**
-	 * Get the `model.homepage` service
-	 *
-	 * @param   Container  $container  The DI container.
-	 *
-	 * @return  HomepageModel
-	 */
-	public function getModelHomepageService(Container $container): HomepageModel
-	{
-		return new HomepageModel($container->get(DatabaseInterface::class));
 	}
 
 	/**
@@ -251,21 +224,6 @@ class SiteApplicationProvider implements ServiceProviderInterface
 	public function getControllerResolverService(Container $container): ControllerResolverInterface
 	{
 		return new ContainerControllerResolver($container);
-	}
-
-	/**
-	 * Get the `view.homepage.html` service
-	 *
-	 * @param   Container  $container  The DI container.
-	 *
-	 * @return  HomepageHtmlView
-	 */
-	public function getViewHomepageHtmlService(Container $container): HomepageHtmlView
-	{
-		return new HomepageHtmlView(
-			$container->get('model.homepage'),
-			$container->get('renderer')
-		);
 	}
 
 	/**

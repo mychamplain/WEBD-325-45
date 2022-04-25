@@ -20,6 +20,8 @@ use Octoleo\CMS\Date\Date;
 use Octoleo\CMS\Factory;
 use Octoleo\CMS\Filter\InputFilter;
 use Octoleo\CMS\Session\MetadataManager;
+use Exception;
+use RuntimeException;
 
 /**
  * Default factory for creating User objects
@@ -42,6 +44,25 @@ class UserFactory implements UserFactoryInterface
 	private $authentication;
 
 	/**
+	 * @var MetadataManager
+	 */
+	private $manager;
+
+	/**
+	 * The Admin Application
+	 *
+	 * @var  AdminApplication
+	 */
+	private $app;
+
+	/**
+	 * The user objects.
+	 *
+	 * @var  User[]
+	 */
+	private $users = [];
+
+	/**
 	 * @var InputFilter
 	 */
 	private $inputFilter;
@@ -56,6 +77,7 @@ class UserFactory implements UserFactoryInterface
 		'password' => 'RAW',
 		'password2' => 'RAW'
 	];
+
 	/**
 	 * @var BCryptHandler
 	 */
@@ -67,52 +89,37 @@ class UserFactory implements UserFactoryInterface
 	 * @param   DatabaseInterface|null                $db  The database
 	 * @param   AuthenticationStrategyInterface|null  $authentication
 	 *
-	 * @throws \Exception
+	 * @throws Exception
 	 */
 	public function __construct(
 		DatabaseInterface $db = null,
 		AuthenticationStrategyInterface $authentication = null,
+		MetadataManager $manager = null,
 		BCryptHandler $secure = null)
 	{
 		$this->db             = ($db) ?: Factory::getApplication()->get(DatabaseInterface::class);
 		$this->authentication = ($authentication) ?: Factory::getApplication()->get(AuthenticationStrategyInterface::class);
+		$this->manager        = ($manager) ?: Factory::getApplication()->get(MetadataManager::class);
 		$this->secure         = ($secure) ?: new BCryptHandler();
 	}
 
 	/**
-	 * Method to get an instance of a user for the given id or session.
+	 * Method to get an instance of a user for the given id or user in session.
 	 *
-	 * @param   int|null  $id  The id
+	 * @param   int|null  $id  The user id
 	 *
 	 * @return  User
 	 *
-	 * @throws \Exception
+	 * @throws Exception
 	 * @since   1.0.0
 	 */
 	public function getUser(?int $id = null): User
 	{
+		// load the user
 		if (empty($id))
 		{
-			/** @var \Octoleo\CMS\Application\AdminApplication $application */
-			$application = Factory::getApplication();
-
-			$session = $application->getSession();
-
-			// Grab the current session ID
-			$sessionId = $session->getId();
-
-			// Get the session user ID
-			$query = $this->db->getQuery(true)
-				->select($this->db->quoteName('userid'))
-				->from($this->db->quoteName('#__session'))
-				->where($this->db->quoteName('session_id') . ' = :sessionid')
-				->bind(':sessionid', $sessionId)
-				->setLimit(1);
-			$this->db->setQuery($query);
-
-			$id = (int) $this->db->loadResult();
+			return $this->loadUserBySession();
 		}
-
 		return $this->loadUserById($id);
 	}
 
@@ -123,12 +130,49 @@ class UserFactory implements UserFactoryInterface
 	 *
 	 * @return  User
 	 *
-	 * @throws \Exception
+	 * @throws Exception
 	 * @since   1.0.0
 	 */
 	public function loadUserById(int $id): User
 	{
-		return new User($id);
+		// check if we already called for this user
+		if (isset($this->users[$id]))
+		{
+			return $this->users[$id];
+		}
+
+		$this->users[$id] = new User($id);
+
+		return $this->users[$id];
+	}
+
+	/**
+	 * Method to get an instance of a user for the session.
+	 *
+	 * @return  User
+	 *
+	 * @throws Exception
+	 * @since   1.0.0
+	 */
+	public function loadUserBySession(): User
+	{
+		if (!$this->app instanceof AdminApplication)
+		{
+			$this->app = Factory::getApplication();
+		}
+		// Grab the current session ID
+		$sessionId = $this->app->getSession()->getId();
+
+		// Get the session user ID
+		$query = $this->db->getQuery(true)
+			->select($this->db->quoteName('userid'))
+			->from($this->db->quoteName('#__session'))
+			->where($this->db->quoteName('session_id') . ' = :sessionid')
+			->bind(':sessionid', $sessionId)
+			->setLimit(1);
+		$this->db->setQuery($query);
+
+		return $this->loadUserById((int)  $this->db->loadResult());
 	}
 
 	/**
@@ -138,7 +182,7 @@ class UserFactory implements UserFactoryInterface
 	 *
 	 * @return  User
 	 *
-	 * @throws \Exception
+	 * @throws Exception
 	 * @since   1.0.0
 	 */
 	public function loadUserByUsername(string $username): User
@@ -158,47 +202,37 @@ class UserFactory implements UserFactoryInterface
 	/**
 	 * Check if user is active
 	 *
-	 * @param   bool  $purge
-	 *
 	 * @return bool
-	 * @throws \Exception
+	 * @throws Exception
 	 */
-	public function active(?bool $purge = true): bool
+	public function active(): bool
 	{
-		/** @var \Octoleo\CMS\Application\AdminApplication $application */
-		$application = Factory::getApplication();
+		// get the user in the session
+		$user = $this->loadUserBySession();
 
-		$session = $application->getSession();
+		// get the user ID
+		$user_id = $user->get('id', 0);
 
-		// Grab the current session ID
-		$sessionId = $session->getId();
-
-		/** @var \Octoleo\CMS\Session\MetadataManager $manager */
-		$manager = Factory::getContainer()->get(MetadataManager::class);
-
-		$active = $manager->getSessionRecord($sessionId);
-
-		// if no active session is found...
-		if (!$active)
+		// check if we have a user (and it's not blocked)
+		if ($user_id > 0)
 		{
-			return false;
-		}
-
-		// if user above 0 the active
-		if ($active->guest == 0 && $active->userid > 0)
-		{
-			// get user
-			$user = $this->loadUserById($active->userid);
-			// check if user has access
+			// 1 == blocked
 			$blocked = $user->get('block', 1);
+			// 0 == not blocked
 			if ($blocked == 0)
 			{
 				return true;
 			}
-		}
+			// check if we have the application
+			if (!$this->app instanceof AdminApplication)
+			{
+				$this->app = Factory::getApplication();
+			}
+			// Get the session
+			$session = $this->app->getSession();
+			// Grab the current session ID (to purge the session)
+			$sessionId = $session->getId();
 
-		if ($purge)
-		{
 			// Purge the session
 			$query = $this->db->getQuery(true)
 				->delete($this->db->quoteName('#__session'))
@@ -208,7 +242,7 @@ class UserFactory implements UserFactoryInterface
 			{
 				$this->db->setQuery($query)->execute();
 			}
-			catch (\RuntimeException $e)
+			catch (RuntimeException $e)
 			{
 				// The old session is already invalidated, don't let this block logging in
 			}
@@ -237,7 +271,7 @@ class UserFactory implements UserFactoryInterface
 					->setLimit(1)
 			)->loadResult();
 		}
-		catch (\RuntimeException $exception)
+		catch (RuntimeException $exception)
 		{
 			return false;
 		}
@@ -269,7 +303,7 @@ class UserFactory implements UserFactoryInterface
 					->bind(1, $value)
 			)->loadResult();
 		}
-		catch (\RuntimeException $exception)
+		catch (RuntimeException $exception)
 		{
 			return false;
 		}
@@ -282,55 +316,48 @@ class UserFactory implements UserFactoryInterface
 	}
 
 	/**
-	 * Attempt to authenticate the username and password pair.
-	 *
-	 * @return  string|boolean  A string containing a username if authentication is successful, false otherwise.
-	 *
-	 * @since   1.1.0
-	 */
-	public function authenticate()
-	{
-		return $this->authentication->authenticate();
-	}
-
-	/**
 	 * Attempt to login user
 	 *
 	 * @return  boolean  true on success
 	 *
-	 * @throws \Exception
+	 * @throws Exception
 	 * @since   1.0.0
 	 */
 	public function login(): bool
 	{
-		/** @var \Octoleo\CMS\Application\AdminApplication $application */
-		$application = Factory::getApplication();
-
+		// check if we have the application
+		if (!$this->app instanceof AdminApplication)
+		{
+			$this->app = Factory::getApplication();
+		}
 		if (($username = $this->authenticate()) !== false)
 		{
+			// If loadUserByUsername returned an error, then pass it back.
 			$user = $this->loadUserByUsername($username);
 
 			// If loadUserByUsername returned an error, then pass it back.
-			if ($user instanceof \Exception)
+			if ($user instanceof Exception)
 			{
-				$application->enqueueMessage('Login failure', 'Error');
+				$this->app->enqueueMessage('Login failure', 'Error');
 
 				return false;
 			}
 
-			// If loadUserByUsername returned an error, then pass it back.
+			// check if this user is active
+			// 1 = blocked
+			// 0 = active (un blocked)
 			$blocked = $user->get('block', 1);
 			if ($blocked == 1)
 			{
-				$application->enqueueMessage('Login failure, user is blocked. Contact your system administrator.', 'Warning');
+				$this->app->enqueueMessage('Login failure, user is blocked. Contact your system administrator.', 'Warning');
 
 				return false;
 			}
 
-			return $this->setUserSession($application, $user->toArray());
+			return $this->setUserSession($user->toArray());
 		}
 		// set authentication failure message
-		$application->enqueueMessage('Login failure, please try again.', 'Warning');
+		$this->app->enqueueMessage('Login failure, please try again.', 'Warning');
 
 		return false;
 	}
@@ -339,15 +366,17 @@ class UserFactory implements UserFactoryInterface
 	 * Logout user
 	 *
 	 * @return bool
-	 * @throws \Exception
+	 * @throws Exception
 	 */
 	public function logout(): bool
 	{
-		/** @var \Octoleo\CMS\Application\AdminApplication $application */
-		$application = Factory::getApplication();
-
-		$session = $application->getSession();
-
+		// check if we have the application
+		if (!$this->app instanceof AdminApplication)
+		{
+			$this->app = Factory::getApplication();
+		}
+		// Get the session
+		$session = $this->app->getSession();
 		// Grab the current session ID
 		$sessionId = $session->getId();
 
@@ -360,7 +389,7 @@ class UserFactory implements UserFactoryInterface
 		{
 			$this->db->setQuery($query)->execute();
 		}
-		catch (\RuntimeException $e)
+		catch (RuntimeException $e)
 		{
 			// The old session is already invalidated, don't let this block logging in
 		}
@@ -383,7 +412,7 @@ class UserFactory implements UserFactoryInterface
 	 *
 	 * @return  boolean  true on success
 	 *
-	 * @throws \Exception
+	 * @throws Exception
 	 * @since   1.0.0
 	 */
 	public function create(
@@ -393,11 +422,12 @@ class UserFactory implements UserFactoryInterface
 		string $password = null,
 		string $password2 = null): bool
 	{
-		/** @var \Octoleo\CMS\Application\AdminApplication $application */
-		$application = Factory::getApplication();
-
-		/** @var \Joomla\Input\Input $input */
-		$input = $application->getInput();
+		// check if we have the application
+		if (!$this->app instanceof AdminApplication)
+		{
+			$this->app = Factory::getApplication();
+		}
+		$input = $this->app->getInput();
 
 		$user = [];
 		$user['name']      = ($name) ?: $input->getString('name', '');
@@ -405,18 +435,20 @@ class UserFactory implements UserFactoryInterface
 		$user['email']     = ($email) ?: $input->getString('email', '');
 		$user['password']  = ($password) ?: $input->getString('password', '');
 		$user['password2'] = ($password2) ?: $input->getString('password2', '');
+		// normally we don't add newly registered users to the admin group
+		$add_to_admin_group = false;
 
 		// check if username exist
 		if (!empty($user['username']) && $this->exist($user['username']))
 		{
-			$application->enqueueMessage('Username already exist, try another username.', 'Warning');
+			$this->app->enqueueMessage('Username already exist, try another username.', 'Warning');
 
 			return false;
 		}
 		// check if email exist
 		if (!empty($user['email']) && $this->exist($user['email'], 'email'))
 		{
-			$application->enqueueMessage('Email already exist, try another email.', 'Warning');
+			$this->app->enqueueMessage('Email already exist, try another email.', 'Warning');
 
 			return false;
 		}
@@ -437,13 +469,13 @@ class UserFactory implements UserFactoryInterface
 			if (empty($detail))
 			{
 				$valid = false;
-				$application->enqueueMessage($key . ' is required', 'error');
+				$this->app->enqueueMessage($key . ' is required', 'error');
 			}
 			// check if its valid
-			if (!$this->valid($key, $detail))
+			elseif (!$this->valid($key, $detail))
 			{
 				$valid = false;
-				$application->enqueueMessage($key . ' is not valid', 'error');
+				$this->app->enqueueMessage($key . ' is not valid', 'error');
 			}
 		}
 
@@ -451,7 +483,7 @@ class UserFactory implements UserFactoryInterface
 		if (isset($user['password2']) && $user['password'] != $user['password2'])
 		{
 			$valid = false;
-			$application->enqueueMessage('Passwords do not match', 'error');
+			$this->app->enqueueMessage('Passwords do not match', 'error');
 		}
 		unset ($user['password2']);
 
@@ -473,7 +505,10 @@ class UserFactory implements UserFactoryInterface
 			}
 			else
 			{
+				// this is the first account (so it's an admin account)
 				$user['block'] = 0;
+				// we must add this user to the admin group
+				$add_to_admin_group = true;
 			}
 			// there are no params at this stage
 			$user['params'] = '';
@@ -485,25 +520,56 @@ class UserFactory implements UserFactoryInterface
 				// Insert the user
 				$result = $this->db->insertObject('#__users', $insert, 'id');
 			}
-			catch (\RuntimeException $exception)
+			catch (RuntimeException $exception)
 			{
-				throw new \RuntimeException($exception->getMessage(), 404);
-
-				return false;
+				throw new RuntimeException($exception->getMessage(), 404);
 			}
 
 			// only set session if success and not blocked
 			if ($result && $user['block'] == 0)
 			{
+				// get the user ID
 				$user['id'] = $this->db->insertid();
-				return $this->setUserSession($application, $user);
+				// add to admin
+				if ($add_to_admin_group)
+				{
+					// build the mapped group link to admin
+					$group = [];
+					$group['user_id'] = $user['id'];
+					$group['group_id'] = 1; // admin group ID is normally 1 see /sq/install.sql (line 110)
+
+					$insert = (object) $group;
+
+					try
+					{
+						// Insert the user group link
+						$this->db->insertObject('#__user_usergroup_map', $insert);
+					}
+					catch (RuntimeException $exception)
+					{
+						// we ignore this... at this point
+					}
+				}
+				return $this->setUserSession($user);
 			}
 			elseif ($result)
 			{
-				$application->enqueueMessage('You account has been created, an administrator will active it shortly.', 'success');
+				$this->app->enqueueMessage('You account has been created, an administrator will active it shortly.', 'success');
 			}
 		}
 		return false;
+	}
+
+	/**
+	 * Attempt to authenticate the username and password pair.
+	 *
+	 * @return  string|boolean  A string containing a username if authentication is successful, false otherwise.
+	 *
+	 * @since   1.1.0
+	 */
+	private function authenticate()
+	{
+		return $this->authentication->authenticate();
 	}
 
 	/**
@@ -529,16 +595,22 @@ class UserFactory implements UserFactoryInterface
 	}
 
 	/**
-	 * @param   AdminApplication  $application
-	 * @param   array             $user
+	 * Method to add the user to the session
+	 *
+	 * @param  array  $user
 	 *
 	 * @return bool
-	 * @throws \Exception
+	 * @throws Exception
 	 */
-	private function setUserSession(AdminApplication $application, array $user): bool
+	private function setUserSession(array $user): bool
 	{
-		$session = $application->getSession();
-
+		// check if we have the application
+		if (!$this->app instanceof AdminApplication)
+		{
+			$this->app = Factory::getApplication();
+		}
+		// Get the session
+		$session = $this->app->getSession();
 		// Grab the current session ID
 		$oldSessionId = $session->getId();
 
@@ -557,18 +629,16 @@ class UserFactory implements UserFactoryInterface
 		{
 			$this->db->setQuery($query)->execute();
 		}
-		catch (\RuntimeException $e)
+		catch (RuntimeException $e)
 		{
 			// The old session is already invalidated, don't let this block logging in
 		}
 
-		/** @var \Octoleo\CMS\Session\MetadataManager $manager */
-		$manager = Factory::getContainer()->get(MetadataManager::class);
-
-		$manager->createOrUpdateRecord($session, $this->loadUserById($user['id']));
+		// creat or update the record for this user session
+		$this->manager->createOrUpdateRecord($session, $this->loadUserById($user['id']));
 
 		// show a success message
-		$application->enqueueMessage('Welcome ' . $user['name'] . ', you have successfully lodged in!', 'Success');
+		$this->app->enqueueMessage('Welcome ' . $user['name'] . ', you have successfully lodged in!', 'Success');
 
 		return true;
 	}

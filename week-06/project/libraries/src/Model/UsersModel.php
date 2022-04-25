@@ -11,16 +11,17 @@
 namespace Octoleo\CMS\Model;
 
 use Joomla\Database\DatabaseDriver;
-use Joomla\Database\ParameterType;
 use Joomla\Model\DatabaseModelInterface;
 use Joomla\Model\DatabaseModelTrait;
+use Octoleo\CMS\Model\Util\GetUsergroupsInterface;
+use Octoleo\CMS\Model\Util\GetUsergroupsTrait;
 
 /**
- * Model class for users
+ * Model class
  */
-class UsersModel implements DatabaseModelInterface
+class UsersModel implements DatabaseModelInterface, GetUsergroupsInterface
 {
-	use DatabaseModelTrait;
+	use DatabaseModelTrait, GetUsergroupsTrait;
 
 	/**
 	 * Instantiate the model.
@@ -45,7 +46,18 @@ class UsersModel implements DatabaseModelInterface
 			->select('*')
 			->from($db->quoteName('#__users'));
 
-		return $db->setQuery($query)->loadObjectList('id');
+		$users = $db->setQuery($query)->loadObjectList('id');
+
+		// add groups
+		if ($users)
+		{
+			foreach ($users as $id => &$user)
+			{
+				$user->groups = $this->getUsergroups($id);
+			}
+		}
+
+		return $users;
 	}
 
 	public function setLayout(string $name): string

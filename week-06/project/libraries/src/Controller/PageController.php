@@ -14,12 +14,13 @@ use Joomla\Application\AbstractApplication;
 use Joomla\Controller\AbstractController;
 use Joomla\Input\Input;
 use Joomla\Uri\Uri;
-use Octoleo\CMS\View\Page\PageHtmlView;
+use Octoleo\CMS\Utilities\StringHelper;
+use Octoleo\CMS\View\Site\PageHtmlView;
 use Laminas\Diactoros\Response\HtmlResponse;
 use Laminas\Diactoros\Response\RedirectResponse;
 
 /**
- * Controller handling the site's simple text pages
+ * Controller handling the requests
  *
  * @method         \Octoleo\CMS\Application\SiteApplication  getApplication()  Get the application object.
  * @property-read  \Octoleo\CMS\Application\SiteApplication  $app              Application object
@@ -36,9 +37,9 @@ class PageController extends AbstractController
 	/**
 	 * Constructor.
 	 *
-	 * @param   PageHtmlView         $view      The view object.
-	 * @param   Input                $input     The input object.
-	 * @param   AbstractApplication  $app       The application object.
+	 * @param   PageHtmlView              $view   The view object.
+	 * @param   Input|null                $input  The input object.
+	 * @param   AbstractApplication|null  $app    The application object.
 	 */
 	public function __construct(PageHtmlView $view, Input $input = null, AbstractApplication $app = null)
 	{
@@ -57,11 +58,34 @@ class PageController extends AbstractController
 		// Disable all cache for now
 		$this->getApplication()->allowCache(false);
 
-		$page = $this->getInput()->getString('view', '');
-		$details = $this->getInput()->getString('details', '');
+		// get the root name
+		$root = $this->getInput()->getString('root', '');
+		// start building the full path
+		$path = [];
+		$path[] = $root;
+		// set a mad depth TODO: we should limit the menu depth to 6 or something
+		$depth = range(1,20);
+		// load the whole path
+		foreach ($depth as $page)
+		{
+			$page = StringHelper::numbers($page);
+			// check if there is a value
+			$result = $this->getInput()->getString($page, false);
+			if ($result)
+			{
+				$path[] = $result;
+			}
+			else
+			{
+				// first false means we are at the end of the line
+				break;
+			}
+		}
+		// set the final path
+		$path = implode('/', $path);
 
 		// if for some reason the view value is administrator
-		if ('administrator' === $page)
+		if ('administrator' === $root)
 		{
 			// get uri request to get host
 			$uri = new Uri($this->getApplication()->get('uri.request'));
@@ -71,7 +95,7 @@ class PageController extends AbstractController
 		}
 		else
 		{
-			$this->view->setPage($page);
+			$this->view->setPage($path);
 
 			$this->getApplication()->setResponse(new HtmlResponse($this->view->render()));
 		}

@@ -14,15 +14,25 @@ use Joomla\Database\DatabaseDriver;
 use Joomla\Database\ParameterType;
 use Joomla\Model\DatabaseModelInterface;
 use Joomla\Model\DatabaseModelTrait;
-use Joomla\String\StringHelper;
 use Octoleo\CMS\Date\Date;
+use Octoleo\CMS\Model\Util\MenuInterface;
+use Octoleo\CMS\Model\Util\SelectMenuTrait;
+use Octoleo\CMS\Model\Util\UniqueInterface;
+use Octoleo\CMS\Model\Util\UniqueMenuAliasTrait;
 
 /**
- * Model class for menu item
+ * Model class
  */
-class MenuModel implements DatabaseModelInterface
+class MenuModel implements DatabaseModelInterface, UniqueInterface, MenuInterface
 {
-	use DatabaseModelTrait;
+	use DatabaseModelTrait, UniqueMenuAliasTrait, SelectMenuTrait;
+
+	/**
+	 * Active id
+	 *
+	 * @var int
+	 */
+	public $id = 0;
 
 	/**
 	 * @var array
@@ -52,6 +62,7 @@ class MenuModel implements DatabaseModelInterface
 	 * @param   string  $publishDown
 	 * @param   string  $position
 	 * @param   int     $home
+	 * @param   int     $parent
 	 *
 	 * @return  int
 	 * @throws \Exception
@@ -66,12 +77,16 @@ class MenuModel implements DatabaseModelInterface
 		string $publishUp,
 		string $publishDown,
 		string $position,
-		int    $home): int
+		int    $home,
+		int    $parent): int
 	{
 		$db = $this->getDb();
 
-		// set the path if not set
-		$this->setPathAlias($id, $title, $path, $alias);
+		// set the alias if not set
+		$alias = (empty($alias)) ? $title : $alias;
+		$alias = $this->unique($id, $alias, $parent);
+		// set the path
+		$path = $this->getPath($alias, $parent);
 
 		$data = [
 			'title'        => (string) $title,
@@ -82,7 +97,7 @@ class MenuModel implements DatabaseModelInterface
 			'publish_up'   => (string) (empty($publishUp)) ? '0000-00-00 00:00:00' : (new Date($publishUp))->toSql(),
 			'publish_down' => (string) (empty($publishDown)) ? '0000-00-00 00:00:00' : (new Date($publishDown))->toSql(),
 			'home'         => (int) $home,
-			'parent_id'    => 0 // only root items for now
+			'parent_id'    => (int) $parent
 		];
 
 		// we set position in params
@@ -91,7 +106,9 @@ class MenuModel implements DatabaseModelInterface
 		// if we have ID update
 		if ($id > 0)
 		{
+			// set active ID
 			$data['id'] = (int) $id;
+			$this->id   = (int) $id;
 			// change to object
 			$data = (object) $data;
 
@@ -272,67 +289,65 @@ class MenuModel implements DatabaseModelInterface
 	}
 
 	/**
-	 * @param   int     $id
-	 * @param   string  $title
-	 * @param   string  $path
+	 * get path
+	 *
 	 * @param   string  $alias
+	 * @param   int     $parent
+	 *
+	 * @return string
 	 */
-	private function setPathAlias(int $id, string $title, string &$path, string &$alias)
+	private function getPath(string $alias, int $parent): string
 	{
-		$alias = (empty($alias)) ? $title : $alias;
-		$alias = preg_replace('/\s+/', '-', strtolower(preg_replace("/[^A-Za-z0-9\- ]/", '', $alias)));
-		// TODO: we will only have root menus for now, no sub-menus
-		$seeker  = $alias;
-		$pointer = 2;
-		while ($this->exist($id, $seeker))
+		// alias bucket
+		$bucket = [];
+		$bucket[] = $alias;
+		$parent = $this->getParent($parent);
+		// make sure to get all path aliases TODO: we should limit the menu depth to 6 or something
+		while (isset($parent->alias))
 		{
-			$seeker = $alias . '-' . $pointer;
-			$pointer++;
+			// load the alias
+			$bucket[] = $parent->alias;
+			// get the next parent
+			$parent = $this->getParent($parent->parent_id);
 		}
-		// update the path
-		$alias = $seeker;
-		$path = $seeker;
+		// now return the path
+		return implode('/', array_reverse($bucket));
 	}
 
 	/**
-	 * Check if an alias exist
+	 * get parent
 	 *
 	 * @param   int     $id
-	 * @param   string  $alias
 	 *
-	 * @return bool
+	 * @return \stdClass
 	 */
-	private function exist(int $id, string $alias): bool
+	private function getParent(int $id): \stdClass
 	{
-		$db = $this->getDb();
-		$query = $db->getQuery(true)
-			->select('id')
-			->from($db->quoteName('#__menu'))
-			->where($db->quoteName('alias') . ' = :alias')
-			->bind(':alias', $alias)
-			->setLimit(1);
-
-		// only add the id item exist
 		if ($id > 0)
 		{
-			$query
-				->where($db->quoteName('id') . ' != :id')
-				->bind(':id', $id, ParameterType::INTEGER);
-		}
+			$db    = $this->getDb();
+			$query = $db->getQuery(true)
+				->select('*')
+				->from($db->quoteName('#__menu'))
+				->where($db->quoteName('id') . ' = :id')
+				->bind(':id', $id)
+				->setLimit(1);
 
-		try
-		{
-			$id = $db->setQuery($query)->loadResult();
-		}
-		catch (\RuntimeException $e)
-		{
-			// we ignore this and just return an empty object
-		}
+			try
+			{
+				$parent = $db->setQuery($query)->loadObject();
+			}
+			catch (\RuntimeException $e)
+			{
+				// we ignore this and just return an empty object
+			}
 
-		if (isset($id) && $id > 0)
-		{
-			return true;
+			// return only if found
+			if (isset($parent) && $parent instanceof \stdClass)
+			{
+				return $parent;
+			}
 		}
-		return false;
+		return new \stdClass();
 	}
 }

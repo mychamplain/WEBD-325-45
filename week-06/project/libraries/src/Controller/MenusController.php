@@ -13,14 +13,21 @@ namespace Octoleo\CMS\Controller;
 use Joomla\Application\AbstractApplication;
 use Joomla\Controller\AbstractController;
 use Joomla\Input\Input;
-use Octoleo\CMS\View\Admin\MenusHtmlView;
 use Laminas\Diactoros\Response\HtmlResponse;
+use Octoleo\CMS\Controller\Util\AccessInterface;
+use Octoleo\CMS\Controller\Util\AccessTrait;
+use Octoleo\CMS\Controller\Util\CheckTokenInterface;
+use Octoleo\CMS\Controller\Util\CheckTokenTrait;
+use Octoleo\CMS\Factory;
+use Octoleo\CMS\User\User;
+use Octoleo\CMS\User\UserFactoryInterface;
+use Octoleo\CMS\View\Admin\MenusHtmlView;
 
 /**
- * Controller handling the site's dashboard
+ * Controller handling the requests
  *
  * @method         \Octoleo\CMS\Application\AdminApplication  getApplication()  Get the application object.
- * @property-read  \Octoleo\CMS\Application\AdminApplication  $app              Application object
+ * @property-read  \Octoleo\CMS\Application\AdminApplication $app              Application object
  */
 class MenusController extends AbstractController implements AccessInterface, CheckTokenInterface
 {
@@ -34,18 +41,28 @@ class MenusController extends AbstractController implements AccessInterface, Che
 	private $view;
 
 	/**
+	 * @var User
+	 */
+	private $user;
+
+	/**
 	 * Constructor.
 	 *
-	 * @param   MenusHtmlView        $view   The view object.
-	 * @param   Input                $user   The user object.
-	 * @param   Input                $input  The input object.
-	 * @param   AbstractApplication  $app    The application object.
+	 * @param   MenusHtmlView             $view   The view object.
+	 * @param   Input|null                $input  The input object.
+	 * @param   AbstractApplication|null  $app    The application object.
+	 * @param   User|null                 $user   The user object.
 	 */
-	public function __construct(MenusHtmlView $view, Input $input = null, AbstractApplication $app = null)
+	public function __construct(
+		MenusHtmlView       $view,
+		Input               $input = null,
+		AbstractApplication $app = null,
+		User                $user = null)
 	{
 		parent::__construct($input, $app);
 
 		$this->view = $view;
+		$this->user = ($user) ?: Factory::getContainer()->get(UserFactoryInterface::class)->getUser();
 	}
 
 	/**
@@ -62,7 +79,7 @@ class MenusController extends AbstractController implements AccessInterface, Che
 		$this->view->setActiveView('menus');
 
 		// check if user is allowed to access
-		if ($this->allow('menus'))
+		if ($this->allow('menus') && $this->user->get('access.menu.read', false))
 		{
 			$this->getApplication()->setResponse(new HtmlResponse($this->view->render()));
 		}

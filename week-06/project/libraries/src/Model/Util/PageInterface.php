@@ -8,7 +8,7 @@
  * @license    GNU General Public License version 2 or later; see LICENSE.txt
  */
 
-namespace Octoleo\CMS\Model;
+namespace Octoleo\CMS\Model\Util;
 
 /**
  * Class for getting page data

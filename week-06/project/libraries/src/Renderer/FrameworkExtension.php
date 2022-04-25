@@ -46,6 +46,8 @@ class FrameworkExtension extends AbstractExtension
 			new TwigFunction('route', [FrameworkTwigRuntime::class, 'getRouteUri']),
 			new TwigFunction('sri', [FrameworkTwigRuntime::class, 'getSriAttributes'], ['is_safe' => ['html']]),
 			new TwigFunction('message_queue', [FrameworkTwigRuntime::class, 'getMessageQueue']),
+			new TwigFunction('user_array', [FrameworkTwigRuntime::class, 'getUserArray']),
+			new TwigFunction('user', [FrameworkTwigRuntime::class, 'getUser']),
 			new TwigFunction('token', [FrameworkTwigRuntime::class, 'getToken']),
 			new TwigFunction('shorten_string', [FrameworkTwigRuntime::class, 'shortenString']),
 		];

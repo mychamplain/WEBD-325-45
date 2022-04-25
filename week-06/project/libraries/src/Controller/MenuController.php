@@ -12,18 +12,24 @@ namespace Octoleo\CMS\Controller;
 
 use Joomla\Application\AbstractApplication;
 use Joomla\Controller\AbstractController;
-use Joomla\Filter\InputFilter as InputFilterAlias;
 use Joomla\Input\Input;
+use Laminas\Diactoros\Response\HtmlResponse;
+use Octoleo\CMS\Controller\Util\AccessInterface;
+use Octoleo\CMS\Controller\Util\AccessTrait;
+use Octoleo\CMS\Controller\Util\CheckTokenInterface;
+use Octoleo\CMS\Controller\Util\CheckTokenTrait;
+use Octoleo\CMS\Factory;
 use Octoleo\CMS\Filter\InputFilter;
 use Octoleo\CMS\Model\MenuModel;
-use Laminas\Diactoros\Response\HtmlResponse;
+use Octoleo\CMS\User\User;
+use Octoleo\CMS\User\UserFactoryInterface;
 use Octoleo\CMS\View\Admin\MenuHtmlView;
 
 /**
- * Controller handling the site's dashboard
+ * Controller handling the requests
  *
  * @method         \Octoleo\CMS\Application\AdminApplication  getApplication()  Get the application object.
- * @property-read  \Octoleo\CMS\Application\AdminApplication  $app              Application object
+ * @property-read  \Octoleo\CMS\Application\AdminApplication $app              Application object
  */
 class MenuController extends AbstractController implements AccessInterface, CheckTokenInterface
 {
@@ -49,25 +55,30 @@ class MenuController extends AbstractController implements AccessInterface, Chec
 	private $inputFilter;
 
 	/**
+	 * @var User
+	 */
+	private $user;
+
+	/**
 	 * Constructor.
 	 *
-	 * @param   MenuModel            $model  The model object.
-	 * @param   MenuHtmlView         $view   The view object.
-	 * @param   Input                $input  The input object.
-	 * @param   AbstractApplication  $app    The application object.
+	 * @param   MenuModel                 $model  The model object.
+	 * @param   MenuHtmlView              $view   The view object.
+	 * @param   Input|null                $input  The input object.
+	 * @param   AbstractApplication|null  $app    The application object.
 	 */
-	public function __construct(MenuModel $model, MenuHtmlView $view, Input $input = null, AbstractApplication $app = null)
+	public function __construct(
+		MenuModel           $model,
+		MenuHtmlView        $view,
+		Input               $input = null,
+		AbstractApplication $app = null,
+		User                $user = null)
 	{
 		parent::__construct($input, $app);
 
 		$this->model = $model;
-		$this->view = $view;
-		$this->inputFilter = InputFilter::getInstance(
-			[],
-			[],
-			InputFilterAlias::ONLY_BLOCK_DEFINED_TAGS,
-			InputFilterAlias::ONLY_BLOCK_DEFINED_ATTRIBUTES
-		);
+		$this->view  = $view;
+		$this->user  = ($user) ?: Factory::getContainer()->get(UserFactoryInterface::class)->getUser();
 	}
 
 	/**
@@ -82,19 +93,26 @@ class MenuController extends AbstractController implements AccessInterface, Chec
 		$this->getApplication()->allowCache(false);
 
 		$method = $this->getInput()->getMethod();
-		$task = $this->getInput()->getString('task', '');
-		$id = $this->getInput()->getInt('id', 0);
+		$task   = $this->getInput()->getString('task', '');
+		$id     = $this->getInput()->getInt('id', 0);
 
 		// if task is delete
 		if ('delete' === $task)
 		{
-			if ($this->model->delete($id))
+			if ($this->allow('menu') && $this->user->get('access.menu.delete', false))
 			{
-				$this->getApplication()->enqueueMessage('Menu was deleted!', 'success');
+				if ($this->model->delete($id))
+				{
+					$this->getApplication()->enqueueMessage('Menu was deleted!', 'success');
+				}
+				else
+				{
+					$this->getApplication()->enqueueMessage('Menu could not be deleted!', 'error');
+				}
 			}
 			else
 			{
-				$this->getApplication()->enqueueMessage('Menu could not be deleted!', 'error');
+				$this->getApplication()->enqueueMessage('You do not have permission to delete this menu!', 'error');
 			}
 			// go to set page
 			$this->_redirect('menus');
@@ -104,21 +122,57 @@ class MenuController extends AbstractController implements AccessInterface, Chec
 
 		if ('POST' === $method)
 		{
-			$id = $this->setItem();
+			// check permissions
+			$update = ($id > 0 && $this->user->get('access.menu.update', false));
+			$create = ($id == 0 && $this->user->get('access.menu.create', false));
+
+			if ( $create || $update )
+			{
+				$id = $this->setItem();
+			}
+			else
+			{
+				// not allowed creating menu
+				if ($id == 0)
+				{
+					$this->getApplication()->enqueueMessage('You do not have permission to create menus!', 'error');
+				}
+				// not allowed updating menu
+				if ($id > 0)
+				{
+					$this->getApplication()->enqueueMessage('You do not have permission to update the menu details!', 'error');
+				}
+			}
 		}
 
-		$this->view->setActiveId($id);
-		$this->view->setActiveView('menu');
+		// check permissions
+		$read = ($id > 0 && $this->user->get('access.menu.read', false));
+		$create = ($id == 0 && $this->user->get('access.menu.create', false));
 
 		// check if user is allowed to access
-		if ($this->allow('menu'))
+		if ($this->allow('menu') && ( $read || $create ))
 		{
+			// set values for view
+			$this->view->setActiveId($id);
+			$this->view->setActiveView('menu');
+
 			$this->getApplication()->setResponse(new HtmlResponse($this->view->render()));
 		}
 		else
 		{
+			// not allowed creating menu
+			if ($id == 0 && !$create)
+			{
+				$this->getApplication()->enqueueMessage('You do not have permission to create menus!', 'error');
+			}
+			// not allowed read menu
+			if ($id > 0 && !$read)
+			{
+				$this->getApplication()->enqueueMessage('You do not have permission to read the menu details!', 'error');
+			}
+
 			// go to set page
-			$this->_redirect();
+			$this->_redirect('menus');
 		}
 
 		return true;
@@ -139,17 +193,18 @@ class MenuController extends AbstractController implements AccessInterface, Chec
 		$post = $this->getInput()->getInputForRequestMethod();
 
 		// we get all the needed items
-		$tempItem = [];
-		$tempItem['id'] = $post->getInt('menu_id', 0);
-		$tempItem['title'] = $post->getString('title', '');
-		$tempItem['alias'] = $post->getString('alias', '');
-		$tempItem['path']  = $post->getString('path', '');
-		$tempItem['item_id'] = $post->getInt('item_id', 0);
-		$tempItem['published'] = $post->getInt('published', 1);
-		$tempItem['publish_up'] = $post->getString('publish_up', '');
+		$tempItem                 = [];
+		$tempItem['id']           = $post->getInt('menu_id', 0);
+		$tempItem['title']        = $post->getString('title', '');
+		$tempItem['alias']        = $post->getString('alias', '');
+		$tempItem['path']         = $post->getString('path', '');
+		$tempItem['item_id']      = $post->getInt('item_id', 0);
+		$tempItem['published']    = $post->getInt('published', 1);
+		$tempItem['publish_up']   = $post->getString('publish_up', '');
 		$tempItem['publish_down'] = $post->getString('publish_down', '');
-		$tempItem['position'] = $post->getString('position', 'center');
-		$tempItem['home']  = $post->getInt('home', 0);
+		$tempItem['position']     = $post->getString('position', 'center');
+		$tempItem['home']         = $post->getInt('home', 0);
+		$tempItem['parent_id']    = $post->getInt('parent_id', 0);
 
 		// check that we have a Title
 		$can_save = true;
@@ -182,7 +237,8 @@ class MenuController extends AbstractController implements AccessInterface, Chec
 				$tempItem['publish_up'],
 				$tempItem['publish_down'],
 				$tempItem['position'],
-				$tempItem['home']);
+				$tempItem['home'],
+				$tempItem['parent_id']);
 		}
 
 		// add to model the post values

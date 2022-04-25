@@ -13,21 +13,22 @@ namespace Octoleo\CMS\View\Admin;
 use Octoleo\CMS\Model\MenuModel;
 use Joomla\Renderer\RendererInterface;
 use Joomla\View\HtmlView;
+use Octoleo\CMS\Model\Util\MenuInterface;
 
 /**
- * Dashboard HTML view class for the application
+ * HTML view class for the application
  */
 class MenuHtmlView extends HtmlView
 {
 	/**
-	 * The id of item/user/menu
+	 * The id
 	 *
 	 * @var int
 	 */
 	private $id;
 
 	/**
-	 * The item model object.
+	 * The model object.
 	 *
 	 * @var  MenuModel
 	 */
@@ -36,7 +37,7 @@ class MenuHtmlView extends HtmlView
 	/**
 	 * Instantiate the view.
 	 *
-	 * @param   MenuModel          $model      The page model object.
+	 * @param   MenuModel          $model      The model object.
 	 * @param   RendererInterface  $renderer   The renderer object.
 	 */
 	public function __construct(MenuModel $model, RendererInterface $renderer)
@@ -54,9 +55,16 @@ class MenuHtmlView extends HtmlView
 	 */
 	public function render(): string
 	{
+		// set the active menus if possible
+		$menus = [];
+		if ($this->model instanceof MenuInterface)
+		{
+			$menus = $this->model->getMenus($this->id);
+		}
 		$this->setData([
 			'form' => $this->model->getItem($this->id),
-			'items' => $this->model->getItems()
+			'items' => $this->model->getItems(),
+			'menus' => $menus
 		]);
 		return parent::render();
 	}
@@ -74,9 +82,9 @@ class MenuHtmlView extends HtmlView
 	}
 
 	/**
-	 * Set the active page details
+	 * Set the active id
 	 *
-	 * @param   int  $id  The selected item/user/menu
+	 * @param   int  $id  The active id
 	 *
 	 * @return  void
 	 */

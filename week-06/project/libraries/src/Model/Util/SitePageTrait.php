@@ -8,7 +8,7 @@
  * @license    GNU General Public License version 2 or later; see LICENSE.txt
  */
 
-namespace Octoleo\CMS\Model;
+namespace Octoleo\CMS\Model\Util;
 
 use Joomla\Database\ParameterType;
 
@@ -33,10 +33,13 @@ trait SitePageTrait
 		$db = $this->getDb();
 
 		$query = $db->getQuery(true)
-			->select('t.*')
-			->from($db->quoteName('#__menu', 'a'))
-			->join('INNER', $db->quoteName('#__item', 't'), 'a.item_id = t.id')
-			->where($db->quoteName('path') . ' = :path')
+			->select('i.*')
+			->select($db->quoteName(array('m.id'), array('menu_id')))
+			->from($db->quoteName('#__menu', 'm'))
+			->join('INNER', $db->quoteName('#__item', 'i'), 'm.item_id = i.id')
+			->where($db->quoteName('i.state') . ' >= 1')
+			->where($db->quoteName('m.published') . ' = 1')
+			->where($db->quoteName('m.path') . ' = :path')
 			->bind(':path', $path)
 			->setLimit(1);
 
@@ -71,9 +74,13 @@ trait SitePageTrait
 		$db = $this->getDb();
 
 		$query = $db->getQuery(true)
-			->select('a.*')
-			->from($db->quoteName('#__item', 'a'))
-			->where($db->quoteName('id') . ' = :id')
+			->select('i.*')
+			->select($db->quoteName(array('m.id'), array('menu_id')))
+			->from($db->quoteName('#__item', 'i'))
+			->join('INNER', $db->quoteName('#__menu', 'm'), 'i.id = m.item_id')
+			->where($db->quoteName('m.published') . ' = 1')
+			->where($db->quoteName('i.state') . ' >= 1')
+			->where($db->quoteName('i.id') . ' = :id')
 			->bind(':id', $item, ParameterType::INTEGER)
 			->setLimit(1);
 

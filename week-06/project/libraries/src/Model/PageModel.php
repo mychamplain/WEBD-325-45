@@ -13,13 +13,19 @@ namespace Octoleo\CMS\Model;
 use Joomla\Database\DatabaseDriver;
 use Joomla\Model\DatabaseModelInterface;
 use Joomla\Model\DatabaseModelTrait;
+use Octoleo\CMS\Model\Util\MenuInterface;
+use Octoleo\CMS\Model\Util\PageInterface;
+use Octoleo\CMS\Model\Util\HomeMenuInterface;
+use Octoleo\CMS\Model\Util\HomeMenuTrait;
+use Octoleo\CMS\Model\Util\SiteMenuTrait;
+use Octoleo\CMS\Model\Util\SitePageTrait;
 
 /**
- * Model class for pages
+ * Model class
  */
-class PageModel implements DatabaseModelInterface, MenuInterface, PageInterface
+class PageModel implements DatabaseModelInterface, MenuInterface, PageInterface, HomeMenuInterface
 {
-	use DatabaseModelTrait, SiteMenuTrait, SitePageTrait;
+	use DatabaseModelTrait, HomeMenuTrait, SiteMenuTrait, SitePageTrait;
 
 	/**
 	 * Instantiate the model.

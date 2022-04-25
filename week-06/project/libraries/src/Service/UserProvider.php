@@ -13,6 +13,7 @@ namespace Octoleo\CMS\Service;
 use Joomla\Authentication\AuthenticationStrategyInterface;
 use Joomla\Authentication\Strategies\DatabaseStrategy;
 use Joomla\Input\Input;
+use Octoleo\CMS\Session\MetadataManager;
 use Octoleo\CMS\User\UserFactory;
 use Octoleo\CMS\User\UserFactoryInterface;
 use Joomla\Database\DatabaseInterface;
@@ -58,7 +59,8 @@ class UserProvider implements ServiceProviderInterface
 	{
 		return new UserFactory(
 			$container->get(DatabaseInterface::class),
-			$container->get(AuthenticationStrategyInterface::class)
+			$container->get(AuthenticationStrategyInterface::class),
+			$container->get(MetadataManager::class)
 		);
 	}
 

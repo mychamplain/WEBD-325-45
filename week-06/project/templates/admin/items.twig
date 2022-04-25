@@ -4,9 +4,11 @@
 
 {% block content %}
 <div class="uk-container uk-margin">
-    <h1 class="uk-article-title">Items</h1>
+    <h1 class="uk-article-title"><span uk-icon="icon: pencil; ratio: 2"></span> Items</h1>
     {{ block("messages_queue", "message_queue.twig") }}
-    <a class="uk-button uk-button-default" href="{{ route() }}index.php/item?task=create">Create</a>
+    {% if user('access.item.create', false) %}
+        <a class="uk-button uk-button-default" href="{{ route() }}index.php/item?task=create">Create</a>
+    {% endif %}
     {% if list %}
     <table class="uk-table uk-table-justify uk-table-divider">
         <thead>
@@ -23,11 +25,17 @@
         <tr>
             <td>
                 <div class="uk-button-group uk-width-1-1">
-                    <a class="uk-button uk-button-default uk-button-small" href="{{ route() }}index.php/item?id={{ item.id }}&task=edit">Edit</a>
-                    <button class="uk-button uk-button-default uk-button-small" onclick="confirmDeletion('{{ item.title }}', {{ item.id }});">Delete</button>
+                    {% if user('access.item.update', false) %}
+                        <a class="uk-button uk-button-default uk-button-small" href="{{ route() }}index.php/item?id={{ item.id }}&task=edit">Edit</a>
+                    {% else %}
+                        <a class="uk-button uk-button-default uk-button-small" href="{{ route() }}index.php/item?id={{ item.id }}&task=edit">Read</a>
+                    {% endif %}
+                    {% if user('access.item.delete', false) %}
+                        <button class="uk-button uk-button-default uk-button-small" onclick="confirmDeletion('{{ item.title|escape('js') }}', {{ item.id }});">Delete</button>
+                    {% endif %}
                 </div>
             </td>
-            <td>{{ item.title }}</td>
+            <td>{{ item.title|escape('html') }}</td>
             <td>{% if item.introtext %}{{ shorten_string(item.introtext|striptags) }} {% endif %}{{ shorten_string(item.fulltext|striptags) }}</td>
             <td>
             {% if item.state == 1 %}
@@ -49,10 +57,15 @@
     </table>
     {% else %}
         <div class="uk-alert-primary" uk-alert>
-            <p>There has no items been found, click create to add some.</p>
+            {% if user('access.item.create', false) %}
+                <p>There has no items been found, click create to add some.</p>
+            {% else %}
+                <p>There has no items been found.</p>
+            {% endif %}
         </div>
     {% endif %}
 </div>
+{% if user('access.item.delete', false) %}
 <script>
     function confirmDeletion(title, id){
         UIkit.modal.confirm('You are about to permanently delete <b>' + title + '</b>?').then(function () {
@@ -62,4 +75,5 @@
         });
     }
 </script>
+{% endif %}
 {% endblock %}

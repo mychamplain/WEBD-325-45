@@ -16,8 +16,7 @@ use Joomla\DI\ServiceProviderInterface;
 use Joomla\Input\Input;
 
 /**
- * Application service provider
- * source: https://github.com/joomla/framework.joomla.org/blob/master/src/Service/ApplicationProvider.php
+ * Input service provider
  */
 class InputProvider implements ServiceProviderInterface
 {

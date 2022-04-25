@@ -4,9 +4,11 @@
 
 {% block content %}
 <div class="uk-container uk-margin">
-    <h1 class="uk-article-title">Menus</h1>
+    <h1 class="uk-article-title"><span uk-icon="icon: menu; ratio: 2"></span> Menus</h1>
     {{ block("messages_queue", "message_queue.twig") }}
-    <a class="uk-button uk-button-default" href="{{ route() }}index.php/menu?task=create">Create</a>
+    {% if user('access.menu.create', false) %}
+        <a class="uk-button uk-button-default" href="{{ route() }}index.php/menu?task=create">Create</a>
+    {% endif %}
     {% if list %}
         <table class="uk-table uk-table-justify uk-table-divider">
             <thead>
@@ -24,17 +26,27 @@
                 <tr>
                     <td>
                         <div class="uk-button-group uk-width-1-1">
-                            <a class="uk-button uk-button-default uk-button-small" href="{{ route() }}index.php/menu?id={{ item.id }}&task=edit">Edit</a>
-                            <button class="uk-button uk-button-default uk-button-small" onclick="confirmDeletion('{{ item.title }}', {{ item.id }});">Delete</button>
+                            {% if user('access.menu.update', false) %}
+                                <a class="uk-button uk-button-default uk-button-small" href="{{ route() }}index.php/menu?id={{ item.id }}&task=edit">Edit</a>
+                            {% else %}
+                                <a class="uk-button uk-button-default uk-button-small" href="{{ route() }}index.php/menu?id={{ item.id }}&task=edit">Read</a>
+                            {% endif %}
+                            {% if user('access.menu.delete', false) %}
+                                <button class="uk-button uk-button-default uk-button-small" onclick="confirmDeletion('{{ item.title|escape('js') }}', {{ item.id }});">Delete</button>
+                            {% endif %}
                         </div>
                     </td>
-                    <td>{% if item.home == 1 %}<span uk-icon="icon: home"></span> {% endif %}{{ item.title }}</td>
+                    <td>{% if item.home == 1 %}<span uk-icon="icon: home"></span> {% endif %}{{ item.title|escape('html') }}</td>
                     <td>
-                        <a class="uk-button uk-button-default uk-button-small uk-width-1-1" href="{{ route() }}index.php/item?id={{ item.item_id }}&task=edit">
+                        {% if user('access.item.update', user('access.item.read', false)) %}
+                            <a class="uk-button uk-button-default uk-button-small uk-width-1-1" href="{{ route() }}index.php/item?id={{ item.item_id }}&task=edit">
+                                {{ shorten_string(item.item_title, 10) }}
+                            </a>
+                        {% else %}
                             {{ shorten_string(item.item_title, 10) }}
-                        </a>
+                        {% endif %}
                     </td>
-                    <td>{{ item.path }}</td>
+                    <td>{{ item.path|escape('html') }}</td>
                     <td>
                         {% if item.published == 1 %}
                             <button class="uk-button uk-button-primary uk-button-small uk-width-1-1">Published</button>
@@ -55,12 +67,18 @@
         </table>
     {% else %}
         <div class="uk-alert-primary" uk-alert>
-            <p>There has no menus been found, click create to add some.</p>
+            {% if user('access.menu.create', false) %}
+                <p>There has no menus been found, click create to add some.</p>
+            {% else %}
+                <p>There has no menus been found.</p>
+            {% endif %}
         </div>
     {% endif %}
 </div>
+{% if user('access.menu.delete', false) %}
 <script>
     function confirmDeletion(title, id){
+        console.log(title);
         UIkit.modal.confirm('You are about to permanently delete <b>' + title + '</b>?').then(function () {
             window.open("{{ route() }}index.php/menu?id=" + id + "&task=delete", "_self")
         }, function () {
@@ -68,4 +86,5 @@
         });
     }
 </script>
+{% endif %}
 {% endblock %}

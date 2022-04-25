@@ -8,19 +8,21 @@
  * @license    GNU General Public License version 2 or later; see LICENSE.txt
  */
 
-namespace Octoleo\CMS\Controller;
+namespace Octoleo\CMS\Controller\Util;
 
 /**
- * Class for checking the form had a token
+ * Class for checking the user access
  *
  * @since  1.0.0
  */
-interface  CheckTokenInterface
+interface  AccessInterface
 {
 	/**
-	 * Check the token of the form
+	 * @param   string  $task
+	 * @param   string  $default
 	 *
 	 * @return bool
+	 * @throws \Exception
 	 */
-	public function checkToken(): bool;
+	public function allow(string $task, string $default = ''): bool;
 }

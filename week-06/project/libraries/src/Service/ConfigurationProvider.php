@@ -14,6 +14,9 @@ use Joomla\DI\Container;
 use Joomla\DI\ServiceProviderInterface;
 use Joomla\Registry\Registry;
 
+/**
+ * Configuration service provider
+ */
 class ConfigurationProvider implements ServiceProviderInterface
 {
 	/**

@@ -16,7 +16,7 @@ use Joomla\Model\DatabaseModelInterface;
 use Joomla\Model\DatabaseModelTrait;
 
 /**
- * Model class for menus
+ * Model class
  */
 class MenusModel implements DatabaseModelInterface
 {

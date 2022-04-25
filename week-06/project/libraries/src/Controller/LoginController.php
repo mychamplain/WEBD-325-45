@@ -18,7 +18,7 @@ use Laminas\Diactoros\Response\HtmlResponse;
 use Octoleo\CMS\View\Admin\DashboardHtmlView;
 
 /**
- * Controller handling the site's homepage
+ * Controller handling the requests
  *
  * @method         \Octoleo\CMS\Application\SiteApplication  getApplication()  Get the application object.
  * @property-read  \Octoleo\CMS\Application\SiteApplication  $app              Application object
@@ -75,7 +75,7 @@ class LoginController extends AbstractController
 		$userFactory = $app->getUserFactory();
 
 		// if the user is logged in we go to dashboard
-		if ($userFactory->active(false))
+		if ($userFactory->active())
 		{
 			$this->view->setActiveDashboard('dashboard');
 			$this->view->setActiveId(0);

@@ -15,12 +15,12 @@ use Joomla\Renderer\RendererInterface;
 use Joomla\View\HtmlView;
 
 /**
- * Dashboard HTML view class for the application
+ * HTML view class for the application
  */
 class ItemsHtmlView extends HtmlView
 {
 	/**
-	 * The item model object.
+	 * The model object.
 	 *
 	 * @var  ItemsModel
 	 */
@@ -29,7 +29,7 @@ class ItemsHtmlView extends HtmlView
 	/**
 	 * Instantiate the view.
 	 *
-	 * @param   ItemsModel         $model       The page model object.
+	 * @param   ItemsModel         $model       The model object.
 	 * @param   RendererInterface  $renderer    The renderer object.
 	 */
 	public function __construct(ItemsModel $model, RendererInterface $renderer)

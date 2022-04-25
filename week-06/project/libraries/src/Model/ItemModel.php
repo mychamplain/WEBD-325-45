@@ -17,7 +17,7 @@ use Joomla\Model\DatabaseModelTrait;
 use Octoleo\CMS\Date\Date;
 
 /**
- * Model class for items
+ * Model class
  */
 class ItemModel implements DatabaseModelInterface
 {
@@ -134,6 +134,8 @@ class ItemModel implements DatabaseModelInterface
 			// remove what can not now be set
 			$data['modified']    = '0000-00-00 00:00:00';
 			$data['modified_by'] = 0;
+			// we don't have any params for now
+			$data['params'] = '';
 			// change to object
 			$data = (object) $data;
 

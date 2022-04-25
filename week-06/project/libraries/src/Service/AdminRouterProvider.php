@@ -21,6 +21,8 @@ use Octoleo\CMS\Controller\MenuController;
 use Octoleo\CMS\Controller\MenusController;
 use Octoleo\CMS\Controller\UserController;
 use Octoleo\CMS\Controller\UsersController;
+use Octoleo\CMS\Controller\UserGroupController;
+use Octoleo\CMS\Controller\UsergroupsController;
 
 use Joomla\Router\Router;
 use Joomla\Router\RouterInterface;
@@ -71,6 +73,14 @@ class AdminRouterProvider implements ServiceProviderInterface
 		$router->all(
 			'/index.php/user',
 			UserController::class
+		);
+		$router->get(
+			'/index.php/usergroups',
+			UsergroupsController::class
+		);
+		$router->all(
+			'/index.php/usergroup',
+			UsergroupController::class
 		);
 		$router->get(
 			'/index.php/menus',

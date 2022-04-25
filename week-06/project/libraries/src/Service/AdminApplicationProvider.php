@@ -26,7 +26,7 @@ use Joomla\Router\RouterInterface;
 use Psr\Log\LoggerInterface;
 
 /**
- * Application service provider
+ * Admin Application service provider
  * source: https://github.com/joomla/framework.joomla.org/blob/master/src/Service/ApplicationProvider.php
  */
 class AdminApplicationProvider implements ServiceProviderInterface

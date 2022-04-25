@@ -8,7 +8,7 @@
  * @license    GNU General Public License version 2 or later; see LICENSE.txt
  */
 
-namespace Octoleo\CMS\Controller;
+namespace Octoleo\CMS\Controller\Util;
 
 use Joomla\Uri\Uri;
 
