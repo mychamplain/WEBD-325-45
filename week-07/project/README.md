@@ -1,6 +1,10 @@
-# Login to the administrator area to manage your pages (items/menus)
+# Content Management System
 
 Content Management of Pages in the Octoleo CMS
+
+# Tutorial
+
+[![](https://git.vdm.dev/champlain/WEBD-325-45/raw/branch/master/week-07/project/media/images/tutorial_thumb.jpg "View Tutorial")](https://www.youtube.com/watch?v=43_V9OxUAdE)
 
 ## To install this CMS
 
@@ -14,7 +18,7 @@ Content Management of Pages in the Octoleo CMS
 
 0. Make sure you have [composer](https://getcomposer.org/doc/00-intro.md#installation-linux-unix-macos) installed on your system.
 1. In your terminal go to the root folder of your Octoleo website where you will find the composer.json file.
-2. Run the following command composer install to install all PHP packages.
+2. Run the following command `composer install` to install all PHP packages.
 
 ## To create an account
 
@@ -51,3 +55,9 @@ Content Management of Pages in the Octoleo CMS
 1. Inside the menu edit/create view [hostname:]/administrator/index.php/menu
 2. You can select one to be the home page
 
+# Just for fun... ((ewɘ))yn
+
+### License & Copyright
+- Written by [Llewellyn van der Merwe](https://github.com/Llewellynvdm), March 2022
+- Copyright (C) 2022. All Rights Reserved
+- License [GNU/GPL Version 2 or later](http://www.gnu.org/licenses/gpl-2.0.html)

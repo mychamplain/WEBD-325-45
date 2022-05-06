@@ -124,7 +124,7 @@
         },
         {
             "name": "cakephp/core",
-            "version": "4.3.7",
+            "version": "4.3.8",
             "source": {
                 "type": "git",
                 "url": "https://github.com/cakephp/core.git",
@@ -181,16 +181,16 @@
         },
         {
             "name": "cakephp/database",
-            "version": "4.3.7",
+            "version": "4.3.8",
             "source": {
                 "type": "git",
                 "url": "https://github.com/cakephp/database.git",
-                "reference": "0a32584763af097eaaba96cf062e2d5d31e6ea3b"
+                "reference": "f565f9d296817692031852d142ee28e0d48f4dd9"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/cakephp/database/zipball/0a32584763af097eaaba96cf062e2d5d31e6ea3b",
-                "reference": "0a32584763af097eaaba96cf062e2d5d31e6ea3b",
+                "url": "https://api.github.com/repos/cakephp/database/zipball/f565f9d296817692031852d142ee28e0d48f4dd9",
+                "reference": "f565f9d296817692031852d142ee28e0d48f4dd9",
                 "shasum": ""
             },
             "require": {
@@ -232,20 +232,20 @@
                 "issues": "https://github.com/cakephp/cakephp/issues",
                 "source": "https://github.com/cakephp/database"
             },
-            "time": "2022-03-12T14:25:33+00:00"
+            "time": "2022-03-29T14:10:04+00:00"
         },
         {
             "name": "cakephp/datasource",
-            "version": "4.3.7",
+            "version": "4.3.8",
             "source": {
                 "type": "git",
                 "url": "https://github.com/cakephp/datasource.git",
-                "reference": "d9e88333a8c6832fddfc38d092f30efcab8cd34d"
+                "reference": "1a177933b3bf988dc91d9a37018cb4ddf2f47190"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/cakephp/datasource/zipball/d9e88333a8c6832fddfc38d092f30efcab8cd34d",
-                "reference": "d9e88333a8c6832fddfc38d092f30efcab8cd34d",
+                "url": "https://api.github.com/repos/cakephp/datasource/zipball/1a177933b3bf988dc91d9a37018cb4ddf2f47190",
+                "reference": "1a177933b3bf988dc91d9a37018cb4ddf2f47190",
                 "shasum": ""
             },
             "require": {
@@ -290,11 +290,11 @@
                 "issues": "https://github.com/cakephp/cakephp/issues",
                 "source": "https://github.com/cakephp/datasource"
             },
-            "time": "2022-03-04T04:39:56+00:00"
+            "time": "2022-03-28T14:39:10+00:00"
         },
         {
             "name": "cakephp/utility",
-            "version": "4.3.7",
+            "version": "4.3.8",
             "source": {
                 "type": "git",
                 "url": "https://github.com/cakephp/utility.git",
@@ -2594,16 +2594,16 @@
         },
         {
             "name": "joomla/uri",
-            "version": "2.0.1",
+            "version": "2.0.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/joomla-framework/uri.git",
-                "reference": "5046ea584b76e485ef84390c6d79bafb358fb605"
+                "reference": "755f1cf80e2463d9a162563e607154c64083184b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/joomla-framework/uri/zipball/5046ea584b76e485ef84390c6d79bafb358fb605",
-                "reference": "5046ea584b76e485ef84390c6d79bafb358fb605",
+                "url": "https://api.github.com/repos/joomla-framework/uri/zipball/755f1cf80e2463d9a162563e607154c64083184b",
+                "reference": "755f1cf80e2463d9a162563e607154c64083184b",
                 "shasum": ""
             },
             "require": {
@@ -2637,7 +2637,7 @@
             ],
             "support": {
                 "issues": "https://github.com/joomla-framework/uri/issues",
-                "source": "https://github.com/joomla-framework/uri/tree/2.0.1"
+                "source": "https://github.com/joomla-framework/uri/tree/2.0.2"
             },
             "funding": [
                 {
@@ -2649,7 +2649,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2022-01-25T12:04:01+00:00"
+            "time": "2022-04-21T09:39:04+00:00"
         },
         {
             "name": "joomla/utilities",
@@ -3902,16 +3902,16 @@
         },
         {
             "name": "symfony/config",
-            "version": "v5.4.7",
+            "version": "v5.4.8",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/config.git",
-                "reference": "05624c386afa1b4ccc1357463d830fade8d9d404"
+                "reference": "9f8964f56f7234f8ace16f66cb3fbae950c04e68"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/config/zipball/05624c386afa1b4ccc1357463d830fade8d9d404",
-                "reference": "05624c386afa1b4ccc1357463d830fade8d9d404",
+                "url": "https://api.github.com/repos/symfony/config/zipball/9f8964f56f7234f8ace16f66cb3fbae950c04e68",
+                "reference": "9f8964f56f7234f8ace16f66cb3fbae950c04e68",
                 "shasum": ""
             },
             "require": {
@@ -3961,7 +3961,7 @@
             "description": "Helps you find, load, combine, autofill and validate configuration values of any kind",
             "homepage": "https://symfony.com",
             "support": {
-                "source": "https://github.com/symfony/config/tree/v5.4.7"
+                "source": "https://github.com/symfony/config/tree/v5.4.8"
             },
             "funding": [
                 {
@@ -3977,20 +3977,20 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2022-03-21T13:42:03+00:00"
+            "time": "2022-04-12T16:02:29+00:00"
         },
         {
             "name": "symfony/console",
-            "version": "v5.4.7",
+            "version": "v5.4.8",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/console.git",
-                "reference": "900275254f0a1a2afff1ab0e11abd5587a10e1d6"
+                "reference": "ffe3aed36c4d60da2cf1b0a1cee6b8f2e5fa881b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/console/zipball/900275254f0a1a2afff1ab0e11abd5587a10e1d6",
-                "reference": "900275254f0a1a2afff1ab0e11abd5587a10e1d6",
+                "url": "https://api.github.com/repos/symfony/console/zipball/ffe3aed36c4d60da2cf1b0a1cee6b8f2e5fa881b",
+                "reference": "ffe3aed36c4d60da2cf1b0a1cee6b8f2e5fa881b",
                 "shasum": ""
             },
             "require": {
@@ -4060,7 +4060,7 @@
                 "terminal"
             ],
             "support": {
-                "source": "https://github.com/symfony/console/tree/v5.4.7"
+                "source": "https://github.com/symfony/console/tree/v5.4.8"
             },
             "funding": [
                 {
@@ -4076,7 +4076,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2022-03-31T17:09:19+00:00"
+            "time": "2022-04-12T16:02:29+00:00"
         },
         {
             "name": "symfony/deprecation-contracts",
@@ -4858,16 +4858,16 @@
         },
         {
             "name": "symfony/process",
-            "version": "v5.4.7",
+            "version": "v5.4.8",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/process.git",
-                "reference": "38a44b2517b470a436e1c944bf9b9ba3961137fb"
+                "reference": "597f3fff8e3e91836bb0bd38f5718b56ddbde2f3"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/process/zipball/38a44b2517b470a436e1c944bf9b9ba3961137fb",
-                "reference": "38a44b2517b470a436e1c944bf9b9ba3961137fb",
+                "url": "https://api.github.com/repos/symfony/process/zipball/597f3fff8e3e91836bb0bd38f5718b56ddbde2f3",
+                "reference": "597f3fff8e3e91836bb0bd38f5718b56ddbde2f3",
                 "shasum": ""
             },
             "require": {
@@ -4900,7 +4900,7 @@
             "description": "Executes commands in sub-processes",
             "homepage": "https://symfony.com",
             "support": {
-                "source": "https://github.com/symfony/process/tree/v5.4.7"
+                "source": "https://github.com/symfony/process/tree/v5.4.8"
             },
             "funding": [
                 {
@@ -4916,7 +4916,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2022-03-18T16:18:52+00:00"
+            "time": "2022-04-08T05:07:18+00:00"
         },
         {
             "name": "symfony/service-contracts",
@@ -5003,16 +5003,16 @@
         },
         {
             "name": "symfony/string",
-            "version": "v5.4.3",
+            "version": "v5.4.8",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/string.git",
-                "reference": "92043b7d8383e48104e411bc9434b260dbeb5a10"
+                "reference": "3c061a76bff6d6ea427d85e12ad1bb8ed8cd43e8"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/string/zipball/92043b7d8383e48104e411bc9434b260dbeb5a10",
-                "reference": "92043b7d8383e48104e411bc9434b260dbeb5a10",
+                "url": "https://api.github.com/repos/symfony/string/zipball/3c061a76bff6d6ea427d85e12ad1bb8ed8cd43e8",
+                "reference": "3c061a76bff6d6ea427d85e12ad1bb8ed8cd43e8",
                 "shasum": ""
             },
             "require": {
@@ -5069,7 +5069,7 @@
                 "utf8"
             ],
             "support": {
-                "source": "https://github.com/symfony/string/tree/v5.4.3"
+                "source": "https://github.com/symfony/string/tree/v5.4.8"
             },
             "funding": [
                 {
@@ -5085,7 +5085,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2022-01-02T09:53:40+00:00"
+            "time": "2022-04-19T10:40:37+00:00"
         },
         {
             "name": "symfony/web-link",
@@ -5389,5 +5389,5 @@
     "platform-overrides": {
         "php": "7.2.5"
     },
-    "plugin-api-version": "2.1.0"
+    "plugin-api-version": "2.2.0"
 }

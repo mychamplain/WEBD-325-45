@@ -36,4 +36,63 @@ class PageModel implements DatabaseModelInterface, MenuInterface, PageInterface,
 	{
 		$this->setDb($db);
 	}
+
+    /**
+     * Method to get all date needed for the view
+     *
+     * @param string|null $page
+     *
+     * @return  array  The data needed
+     */
+    public function getData(?string $page): array
+    {
+        // set the defaults
+        $data = (object) [
+            // main title
+            'title' => 'Error',
+            // menus
+            'menus' => [],
+            // menu ID
+            'menu_id' => 0,
+            // is this the home page
+            'menu_home' => false,
+            // home page title
+            'home_menu_title' => 'Home'
+        ];
+        // we check if we have a home page
+        $home_page = $this->getHomePage();
+        // get the page data
+        if (empty($page) && isset($home_page->item_id) && $home_page->item_id > 0)
+        {
+            // this is the home menu
+            $data = $this->getPageItemById($home_page->item_id);
+            $data->menu_home = true;
+        }
+        elseif (!empty($page))
+        {
+            $data = $this->getPageItemByPath($page);
+        }
+        // load the home menu title
+        if (isset($home_page->title))
+        {
+            $data->home_menu_title = $home_page->title;
+        }
+        // check if we found any data
+        if (isset($data->id))
+        {
+            // check if we have intro text we add it to full text
+            if (!empty($data->introtext))
+            {
+                $data->fulltext = $data->introtext . $data->fulltext;
+            }
+        }
+
+        // set the menus if possible
+        if (isset($data->menu_id) && $data->menu_id > 0)
+        {
+            $data->menus = $this->getMenus($data->menu_id);
+        }
+
+        return (array) $data;
+    }
 }
